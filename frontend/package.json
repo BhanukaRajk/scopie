@@ -1,0 +1,15 @@
+{
+  "name": "scopief",
+  "version": "1.0.0",
+  "description": "Frontend module for Scopie ticket booking application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bhanuka Rajakaruna",
+  "license": "ISC",
+  "dependencies": {
+    "antd": "^5.11.2",
+    "tailwind": "^4.0.0"
+  }
+}
