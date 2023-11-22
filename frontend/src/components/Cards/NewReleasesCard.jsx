@@ -2,7 +2,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const MovieCard = ({ movie }) => {
+const NewReleasesCard = ({ movie }) => {
     return (
         <>
             <div className="flex w-full py-2 bg-white shadow-md rounded-md">
@@ -12,16 +12,14 @@ const MovieCard = ({ movie }) => {
                 <div className="flex flex-col">
                     <div className="w-full text-xl text-black">{movie.title}</div>
                     <div className="w-full text-md text-gray-700">{movie.description}</div>
-                    <div className="w-full text-md">{movie.theater}</div>
-                    <div className="w-full text-md">{movie.ticketPrice}</div>
                 </div>
             </div>
         </>
     );
 }
 
-export default MovieCard;
+export default NewReleasesCard;
 
-MovieCard.propTypes = {
+NewReleasesCard.propTypes = {
     movie: PropTypes.object.isRequired,
 };

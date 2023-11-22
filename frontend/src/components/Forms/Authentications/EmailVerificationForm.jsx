@@ -50,7 +50,7 @@ const EmailVerificationForm = ({ enteredEmail, isOpen, onClose }) => {
             <div className="flex flex-col p-8 rounded-lg bg-white text-center">
                 
                 <div className="absolute left-2 top-2">
-                    <AiFillCloseCircle />
+                    <AiFillCloseCircle onClick={onClose}/>
                 </div>
                 
                 <form onSubmit={handleOneTimePasswordInput}>

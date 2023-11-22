@@ -6,7 +6,7 @@ import { Input, Button, message } from "antd";
 
 import { resetPassword } from "../../../apis/forgetPasswordAPI"
 
-const ForgotPasswordResetForm = ({ userEmail }) => {
+const ForgotPasswordResetForm = ({ userEmail, isOpen, onClose }) => {
     const [passwords, setPasswords] = useState({
         email: userEmail,
         newPassword: "",
@@ -54,7 +54,7 @@ const ForgotPasswordResetForm = ({ userEmail }) => {
             <div className="flex flex-col p-8 rounded-lg bg-white text-center">
 
                 <div className="absolute left-2 top-2">
-                    <AiFillCloseCircle />
+                    <AiFillCloseCircle onClick={onClose}/>
                 </div>
 
                 <form onSubmit={handleChangePassword}>
