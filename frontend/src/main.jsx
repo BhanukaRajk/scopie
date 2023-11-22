@@ -3,11 +3,19 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 
-import 'antd/dist/antd.css'
 import '@ant-design/icons'
+import 'antd/dist/reset.css'
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
+import { DrawerProvider } from "./contexts/DrawerContext.jsx";
+import UserProvider from "./contexts/UserContext.jsx";
+
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+	<React.StrictMode>
+		<UserProvider>
+			<DrawerProvider>
+					<App />
+			</DrawerProvider>
+		</UserProvider>
+	</React.StrictMode>
+);

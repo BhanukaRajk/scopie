@@ -21,5 +21,5 @@ const NewReleasesCard = ({ movie }) => {
 export default NewReleasesCard;
 
 NewReleasesCard.propTypes = {
-    movie: PropTypes.object.isRequired,
+    movie: PropTypes.object,
 };

@@ -23,5 +23,6 @@ const MovieCard = ({ movie }) => {
 export default MovieCard;
 
 MovieCard.propTypes = {
-    movie: PropTypes.object.isRequired,
+    movie: PropTypes.object,
+    // movie: PropTypes.object.isRequired,
 };

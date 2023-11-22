@@ -1,4 +1,7 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
+import PropTypes from "prop-types";
+
 import { AiFillCloseCircle } from "react-icons/ai";
 import { verifyEmail } from "../../../apis/forgetPasswordAPI";
 
@@ -7,6 +10,7 @@ import {
     message,
 } from "antd";
 
+// eslint-disable-next-line no-unused-vars
 const EmailVerificationForm = ({ enteredEmail, isOpen, onClose }) => {
     const [verificationData, setVerificationData] = useState({
         email: enteredEmail,
@@ -58,7 +62,7 @@ const EmailVerificationForm = ({ enteredEmail, isOpen, onClose }) => {
                     <div className="w-full text-sm text-gray-700">
                         We have sent an verification code to your your email shortly.<br />
                         Please check your inbox and enter the received verification code here.<br />
-                        If you couldn't find the code check your spam or try to get a new code.<br />
+                        If you could not find the code check your spam or try to get a new code.<br />
                     </div>
                     <div className="flex justify-center">
                         <input
@@ -85,3 +89,9 @@ const EmailVerificationForm = ({ enteredEmail, isOpen, onClose }) => {
 }
 
 export default EmailVerificationForm;
+
+EmailVerificationForm.propTypes = {
+    enteredEmail: PropTypes.string.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+}

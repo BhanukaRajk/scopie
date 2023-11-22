@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
 
 import { AiFillCloseCircle } from "react-icons/ai";
@@ -26,7 +27,7 @@ const LoginForm = () => {
         ) {
             messageApi.open({
                 type: 'error',
-                content: 'Please enter valid credentials!',
+                content: 'Invalid username or password!',
             });
         } else {
             try {
@@ -75,7 +76,7 @@ const LoginForm = () => {
                     </div>
                     <div>
                         <Button type="link" block>
-                            Back to login
+                            Forgot password?
                         </Button>
                     </div>
                 </form>

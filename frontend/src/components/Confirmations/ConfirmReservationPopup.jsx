@@ -1,4 +1,7 @@
+// eslint-disable-next-line no-unused-vars
 import React from "react";
+import PropTypes from "prop-types";
+
 import { Button } from "antd";
 
 const ConfirmReservationPopup = ({ onClose }) => {
@@ -20,3 +23,7 @@ const ConfirmReservationPopup = ({ onClose }) => {
 }
 
 export default ConfirmReservationPopup;
+
+ConfirmReservationPopup.propTypes = {
+    onClose: PropTypes.func,
+};

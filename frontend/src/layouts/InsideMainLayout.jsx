@@ -1,22 +1,28 @@
 // eslint-disable-next-line no-unused-vars
-import React from "react";
-import PropTypes from "prop-types";
+import React, { useEffect} from "react";
+import { useNavigate, Outlet } from "react-router-dom";
+import useUser from "../hooks/useUser";
 
-import SideNavBar from "../components/Navbars/SideNavBar";
+import SideNavBar from "../components/Common/SideNavBar";
 
-const InsideMainLayout = ({ children }) => {
+const InsideMainLayout = () => {
+    const navigate = useNavigate();
+    const user = useUser();
+
+    useEffect(() => {
+        if (!user) {
+            navigate("/login");
+        }
+    }, [user, navigate]);
+
     return (
         <>
-            <div>
+            <section>
+                <Outlet />
                 <SideNavBar />
-                {children}
-            </div>
+            </section>
         </>
     );
 }
 
 export default InsideMainLayout;
-
-InsideMainLayout.propTypes = {
-    children: PropTypes.node.isRequired,
-};

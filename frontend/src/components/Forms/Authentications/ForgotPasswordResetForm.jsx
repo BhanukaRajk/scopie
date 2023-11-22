@@ -1,10 +1,12 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 import { AiFillCloseCircle } from "react-icons/ai";
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Input, Button, message } from "antd";
 
-import { resetPassword } from "../../../apis/forgetPasswordAPI"
+import { resetPassword } from "../../../apis/forgetPasswordAPI";
 
 const ForgotPasswordResetForm = ({ userEmail, isOpen, onClose }) => {
     const [passwords, setPasswords] = useState({
@@ -50,6 +52,7 @@ const ForgotPasswordResetForm = ({ userEmail, isOpen, onClose }) => {
     return (
         <>
             {contextHolder}
+            {isOpen} {/* TODO: REMOVE THIS */}
 
             <div className="flex flex-col p-8 rounded-lg bg-white text-center">
 
@@ -92,3 +95,9 @@ const ForgotPasswordResetForm = ({ userEmail, isOpen, onClose }) => {
 }
 
 export default ForgotPasswordResetForm;
+
+ForgotPasswordResetForm.propTypes = {
+    userEmail: PropTypes.string.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+}

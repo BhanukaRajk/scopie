@@ -1,19 +1,27 @@
 // eslint-disable-next-line no-unused-vars
-import React from "react";
-import PropTypes from "prop-types";
+import React, {Outlet, useEffect} from "react";
+import { useNavigate } from "react-router-dom";
+import useUser from "../hooks/useUser";
 
-const OutsideMainLayout = ({ children }) => {
+const OutsideMainLayout = () => {
+    const navigate = useNavigate();
+    const user = useUser();
+
+    useEffect(() => {
+        if (!user) {
+            navigate("/login");
+        } else {
+            navigate("/dashboard");
+        }
+    }, [user, navigate]);
+
     return (
         <>
-            <div>
-                {children}
-            </div>
+            <section>
+                <Outlet />
+            </section>
         </>
     );
 }
 
 export default OutsideMainLayout;
-
-OutsideMainLayout.propTypes = {
-    children: PropTypes.node.isRequired,
-};

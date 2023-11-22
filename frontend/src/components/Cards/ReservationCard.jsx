@@ -20,5 +20,5 @@ const ReservationCard = ({ reservation }) => {
 export default ReservationCard;
 
 ReservationCard.propTypes = {
-    reservation: PropTypes.object.isRequired,
+    reservation: PropTypes.object,
 };

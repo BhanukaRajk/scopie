@@ -1,4 +1,7 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
+import PropTypes from "prop-types";
+
 import { AiFillCloseCircle } from "react-icons/ai";
 
 import {
@@ -6,6 +9,7 @@ import {
     message,
 } from "antd";
 
+// eslint-disable-next-line no-unused-vars
 const ForgotPasswordEmailForm = ({ isOpen, onClose }) => {
     const [verifyEmail, setVerifyEmail] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
@@ -62,3 +66,8 @@ const ForgotPasswordEmailForm = ({ isOpen, onClose }) => {
 }
 
 export default ForgotPasswordEmailForm;
+
+ForgotPasswordEmailForm.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+}
