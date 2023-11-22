@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 import { AiFillCloseCircle } from "react-icons/ai";
-import { verifyEmail } from "../../../apis/forgetPasswordAPI";
+import { verifyEmail } from "../../../apis/authAPI";
 
 import {
     Button,

@@ -6,7 +6,7 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Input, Button, message } from "antd";
 
-import { resetPassword } from "../../../apis/forgetPasswordAPI";
+import { resetPassword } from "../../../apis/authAPI";
 
 const ForgotPasswordResetForm = ({ userEmail, isOpen, onClose }) => {
     const [passwords, setPasswords] = useState({
