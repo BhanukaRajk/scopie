@@ -3,7 +3,6 @@ package com.scopie.authservice.controller;
 import com.scopie.authservice.config.JwtGeneratorImpl;
 import com.scopie.authservice.dto.*;
 
-import com.scopie.authservice.entity.User;
 import com.scopie.authservice.service.AuthService;
 
 import com.scopie.authservice.service.EmailService;
@@ -53,8 +52,7 @@ public class AuthController {
 
         if (loginReq.getUsername().matches(regex)) {
             try {
-//                authService.authenticateUser(loginReq.getUsername(), loginReq.getPassword());
-                if(!Objects.equals(authService.authenticateUser(loginReq.getUsername(), loginReq.getPassword()), "false")) {
+                if(Objects.equals(authService.authenticateUser(loginReq.getUsername(), loginReq.getPassword()), "false")) {
                     return Map.of("error", "Invalid username or password!");
                 } else {
                     return new JwtGeneratorImpl().generate(loginReq);
@@ -126,13 +124,8 @@ public class AuthController {
         }
 
         // VALIDATE FIELDS ARE NOT EMPTY
-        if (validationDTO.getFirstName().isEmpty() || validationDTO.getEmail().isEmpty() || validationDTO.getPassword().isEmpty() || validationDTO.getConfPassword().isEmpty()) {
+        if (validationDTO.getFirstName().isEmpty() || validationDTO.getEmail().isEmpty() || validationDTO.getPassword().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please fill all the fields!");
-        }
-
-        // VALIDATE PASSWORD MATCHING
-        if (!Objects.equals(validationDTO.getPassword(), validationDTO.getConfPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password does not match!");
         }
 
         // VALIDATE PASSWORD LENGTH
@@ -144,7 +137,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please enter the OTP!");
         }
 
-        if(!otpService.validateOtp(validationDTO.getEmail(), validationDTO.getOtp())) {
+        if(!otpService.compareOtp(validationDTO.getEmail(), validationDTO.getOtp())) {
+            System.out.println("otp mis!");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid OTP!");
         }
 
@@ -183,62 +177,31 @@ public class AuthController {
 
     // FORGOT PASSWORD USER VALIDATION + OTP REMOVAL
     @PostMapping("/forgot-password/verify-user")
-    public String verifyUser(@RequestParam OtpDTO userOtp) {
+    public Map<String, String> verifyUser(@RequestBody OtpDTO userOtp) {
         if(userOtp.getOtp() != null) {
-            if(otpService.validateOtp(userOtp.getEmail(), userOtp.getOtp())) {
-                return "OTP verified successfully!";
+            if(otpService.compareOtp(userOtp.getEmail(), userOtp.getOtp())) {
+                return Map.of("success", "OTP verified successfully!");
             } else {
-                return "Invalid OTP!";
+                return Map.of("error", "Invalid OTP!");
             }
         } else {
-            throw new RuntimeException("OTP cannot be empty!");
+            return Map.of("error","OTP cannot be empty!");
         }
     }
 
     // CHANGE PASSWORD FUNCTIONALITY + ADDING NEW PASSWORD TO THE DATABASE
-    @PostMapping("/forgot-password/change-password") // TO CHANGE THE PASSWORD OF THE USER
-    public void changePassword(@RequestParam ForgetPasswordDTO newPasswords) {
+    @PutMapping("/forgot-password/change-password") // TO CHANGE THE PASSWORD OF THE USER
+    public Map<String, String> changePassword(@RequestBody ForgetPasswordDTO newPasswords) {
         if(Objects.equals(newPasswords.getPassword(), newPasswords.getConfPassword())) {
             try {
                 authService.changePassword(newPasswords.getEmail(), newPasswords.getPassword());
+                return Map.of("success", "Password reset process successful!");
             } catch (EntityNotFoundException failure) {
                 // IF THE DATA COULD NOT BE STORED IN THE DATABASE PASSWORD WILL NOT BE CHANGED
-                throw new RuntimeException("Password reset process unsuccessful!");
+                return Map.of("error", "Password reset process unsuccessful!");
             }
         } else {
-            throw new RuntimeException("Passwords does not match!");
-        }
-    }
-
-    // LOGOUT FUNCTIONALITY
-    @PostMapping("/logout")
-    public String logout(String username) {
-        return "Logout success";
-    }
-
-
-
-
-
-
-
-
-
-    @CrossOrigin
-    @PostMapping("/signin")
-    public Map<String, String> signin(@RequestBody LoginDTO user) throws Exception {
-        try {
-            if(user.getUsername() == null || user.getPassword() == null) {
-                throw new Exception("Username or password cannot be empty");
-            }
-            User userFound = authService.findByUsernameAndPassword(user.getUsername(), user.getPassword());
-            if (userFound == null) {
-                throw new Exception("User not found");
-            }
-            return new JwtGeneratorImpl().generate(user);
-
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            return Map.of("error", "Passwords does not match!");
         }
     }
 

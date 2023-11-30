@@ -1,19 +1,22 @@
 # Use an official OpenJDK runtime as a parent image
-FROM openjdk:11-jre-slim
-
+FROM openjdk:17.0.1-jdk-slim-buster
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /auth-service
 
 # Copy the Gradle build files
 COPY build.gradle .
 COPY settings.gradle .
-COPY gradle.properties .
+COPY gradlew .
+COPY gradlew.bat .
+
+#Copy the required gradle files
+COPY gradle/ ./gradle/
 
 # Copy the entire source code
 COPY src/ ./src/
 
 # Build the application
-RUN ./gradlew build
+RUN ./gradlew build -x test
 
 # Make port 3202 available to the world outside this container
 EXPOSE 3202

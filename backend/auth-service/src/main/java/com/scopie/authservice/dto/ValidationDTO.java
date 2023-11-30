@@ -14,7 +14,6 @@ public class ValidationDTO {
     private String lastName;
     private String email;
     private String password;
-    private String confPassword;
     private String otp;
 
 }
