@@ -5,8 +5,8 @@ import PropTypes from "prop-types";
 const NewReleasesCard = ({ movie }) => {
     return (
         <>
-            <div className="flex w-full py-2 bg-white shadow-md rounded-md">
-                <div>
+            <div className="flex md:flex-col gap-2 w-72 md:w-64 p-4 bg-gray-300 shadow-md rounded-md">
+                <div className="text-center">
                     <img className="w-20 h-20 rounded-md" src={movie.poster} alt={movie.title} />
                 </div>
                 <div className="flex flex-col">

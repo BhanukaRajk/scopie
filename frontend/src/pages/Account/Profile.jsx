@@ -2,7 +2,7 @@
 import React from "react";
 
 const Profile = () => {
-    return <> MovePage </>
+    return <> Edit profile </>
 }
 
 export default Profile;

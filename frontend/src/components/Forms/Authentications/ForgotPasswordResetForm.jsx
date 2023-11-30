@@ -1,45 +1,70 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { AiFillCloseCircle } from "react-icons/ai";
-import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { Input, Button, message } from "antd";
+import { message } from "antd";
 
 import { resetPassword } from "../../../apis/authAPI";
+import { NavLink } from "react-router-dom";
 
-const ForgotPasswordResetForm = ({ userEmail, isOpen, onClose }) => {
+const ForgotPasswordResetForm = () => {
     const [passwords, setPasswords] = useState({
-        email: userEmail,
-        newPassword: "",
-        confirmPassword: ""
+        email: sessionStorage.getItem("email"),
+        password: "",
+        confPassword: ""
     });
     const [messageApi, contextHolder] = message.useMessage();
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+        if (passwords.email === null || passwords.email === "") {
+            navigate("/forgot-password/verify-username");
+        }
+    }, [passwords.email, navigate]);
+
+    const handlePasswordInputChange = (e) => {
+        if (passwords.email === null || passwords.email === "") {
+            setPasswords({ ...passwords, email: sessionStorage.getItem("user") });
+        }
+        const { name, value } = e.target;
+        setPasswords({ ...passwords, [name]: value });
+    };
 
     const handleChangePassword = async (event) => {
         event.preventDefault();
         if (
-            passwords.newPassword === "" || passwords.newPassword === null ||
-            passwords.confirmPassword === "" || passwords.confirmPassword === null
+            passwords.password === "" || passwords.password === null ||
+            passwords.confPassword === "" || passwords.confPassword === null ||
+            passwords.password.length < 8
         ) {
             messageApi.open({
                 type: 'error',
                 content: 'Your password must be 8 characters or more long!',
             });
-        } else if (passwords.newPassword !== passwords.confirmPassword) {
+        } else if (passwords.password !== passwords.confPassword) {
             messageApi.open({
                 type: 'error',
                 content: 'Passwords does not match!',
             });
         } else {
             try {
+                console.log(passwords);
                 const response = await resetPassword(passwords);
-                console.log(response);
-                messageApi.open({
-                    type: 'success',
-                    content: 'Password changed!!',
-                });
-            } catch(error) {
+                if (response.data.error != null) {
+                    messageApi.open({
+                        type: 'error',
+                        content: response.data.error
+                    })
+                } else {
+                    await messageApi.open({
+                        type: 'success',
+                        content: 'Password changed!!',
+                    });
+                    sessionStorage.removeItem("email");
+                    navigate("/login");
+                }
+            } catch (error) {
                 console.error(error);
                 messageApi.open({
                     type: 'error',
@@ -52,52 +77,38 @@ const ForgotPasswordResetForm = ({ userEmail, isOpen, onClose }) => {
     return (
         <>
             {contextHolder}
-            {isOpen} {/* TODO: REMOVE THIS */}
 
-            <div className="flex flex-col p-8 rounded-lg bg-white text-center">
-
-                <div className="absolute left-2 top-2">
-                    <AiFillCloseCircle onClick={onClose}/>
-                </div>
-
-                <form onSubmit={handleChangePassword}>
-                    <div className="w-full text-lg">Add new password</div>
-                    <div className="flex justify-center">
-                        <Input.Password
-                            placeholder="Enter new password"
-                            value={passwords.newPassword}
-                            onChange={setPasswords}
-                            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                        />
+            <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-md">
+                <h1 className="text-black font-serif">Scopie</h1>
+                <form onSubmit={handleChangePassword} className="mt-4 w-64 flex flex-col">
+                    <div className="mb-4">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            onChange={handlePasswordInputChange}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                            placeholder="New Password"
+                            required />
                     </div>
-                    <div className="flex justify-center">
-                        <Input.Password
-                            placeholder="Confirm password"
-                            value={passwords.confirmPassword}
-                            onChange={setPasswords}
-                            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                        />
+                    <div className="mb-4">
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confPassword"
+                            onChange={handlePasswordInputChange}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                            placeholder="Confirm New Password"
+                            required />
                     </div>
-                    <div>
-                        <Button type="primary" htmlType="submit" block>
-                            Change Password
-                        </Button>
-                    </div>
-                    <div>
-                        <Button type="link" block>
-                            Back to login
-                        </Button>
-                    </div>
+                    <button type="submit" className=" text-md text-center bg-blue-700 hover:bg-blue-400 text-white hover:text-white py-2 rounded-lg font-semibold cursor-pointer">
+                        Change Password
+                    </button>
                 </form>
+                <NavLink to="/login" className="text-sm text-blue-900 mt-4 cursor-pointer">Back to login</NavLink>
             </div>
         </>
     );
 }
 
 export default ForgotPasswordResetForm;
-
-ForgotPasswordResetForm.propTypes = {
-    userEmail: PropTypes.string.isRequired,
-    isOpen: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
-}

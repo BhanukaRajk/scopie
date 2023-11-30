@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const MS_GATEWAY_URL = `${import.meta.env.GATEWAY_URL || "http://localhost:3201"}`;
+const MS_GATEWAY_URL = `${import.meta.env.VITE_GATEWAY_URL || "http://localhost:3202"}`;
 
 const API_URL = `${MS_GATEWAY_URL}/api`;
 
@@ -9,7 +9,7 @@ const api = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
-    withCredentials: true,
+    withCredentials: false,
 });
 
 export default api;

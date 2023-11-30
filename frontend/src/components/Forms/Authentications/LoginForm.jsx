@@ -1,86 +1,128 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import useUser from "../../../hooks/useUser";
 
-import { AiFillCloseCircle } from "react-icons/ai";
-import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { Input, Button, message } from "antd";
+import { message } from "antd";
 
 import { login } from "../../../apis/authAPI";
 
 const LoginForm = () => {
+
+
+
+    const navigate = useNavigate();
+    const { user, setUserContext } = useUser();
+
     const [credentials, setCredentials] = useState({
-        email: "",
+        username: "",
         password: "",
     });
 
-    const [messageApi, contextHolder] = message.useMessage();
+    useEffect(() => {
+        if (user) {
+            navigate("/");
+        }
+    }, [user, navigate]);
 
-    const onChange = (e) => {
-        console.log(e);
+    const [messageApi, contextHolder] = message.useMessage();
+    // const email_regex = new RegExp('^[a-z0-9]+@[a-z]+.[a-z0-9]{2,3}$');
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setCredentials({ ...credentials, [name]: value });
     };
 
     const handleLoginCredentials = async (event) => {
         event.preventDefault();
-        if (
-            credentials.email === "" || credentials.email === null ||
-            credentials.password === "" || credentials.password === null
-        ) {
+        if (credentials.username === "" || credentials.username === null) {
             messageApi.open({
                 type: 'error',
-                content: 'Invalid username or password!',
+                content: 'Username cannot be empty!',
             });
+        } else if (credentials.password === "" || credentials.password === null) {
+            messageApi.open({
+                type: 'error',
+                content: 'Password cannot be empty!',
+            });
+            // } else if (!email_regex.test(credentials.password)) {
+            //     console.log(email_regex.test(credentials.password))
+            //     console.log(email_regex)
+            //     messageApi.open({
+            //         type: 'error',
+            //         content: 'Invalid email format!',
+            //     });
         } else {
             try {
                 const response = await login(credentials);
-                console.log(response);
-                messageApi.open({
-                    type: 'success',
-                    content: 'Successfully logged in!'
-                })
-            } catch {
+                console.log(response); // GET RESPONSE AS OK AND THEN NAVIGATE
+                if (response.data.error != null) {
+                    
+                    messageApi.open({
+                        type: 'error',
+                        content: response.data.error
+                    })
+                    
+                } else {
+
+                    sessionStorage.setItem("token", response.data.token);
+                    setUserContext(credentials.username);
+
+                    await messageApi.open({
+                        type: 'success',
+                        content: "Login successful!"
+                    })
+                    navigate("/");
+
+                }
+            } catch (error) {
                 messageApi.open({
                     type: 'error',
-                    content: 'Login failed!',
+                    content: error.message,
                 });
             }
         }
 
     }
+
     return (
         <>
             {contextHolder}
 
-            <div className="flex flex-col p-8 rounded-lg bg-white text-center">
-
-                <div className="absolute left-2 top-2">
-                    <AiFillCloseCircle />
-                </div>
-
-                <form onSubmit={handleLoginCredentials}>
-                    <div className="w-full text-lg">Login</div>
-                    <div>
-                        <Input placeholder="input with clear icon" allowClear onChange={onChange} />
-                    </div>
-                    <div className="flex justify-center">
-                        <Input.Password
-                            placeholder="Password"
-                            value={credentials.password}
-                            onChange={setCredentials}
-                            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+            <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-md">
+                <h1 className="text-black font-serif">Scopie</h1>
+                <form onSubmit={handleLoginCredentials} className="mt-8 w-64 flex flex-col">
+                    <div className="mb-4">
+                        <input
+                            type="email"
+                            id="username"
+                            name="username"
+                            onChange={handleInputChange}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                            placeholder="Username"
                         />
                     </div>
-                    <div>
-                        <Button type="primary" htmlType="submit" block>
-                            Login
-                        </Button>
+                    <div className="mb-4">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            onChange={handleInputChange}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                            placeholder="Password"
+                        />
                     </div>
-                    <div>
-                        <Button type="link" block>
-                            Forgot password?
-                        </Button>
-                    </div>
+                    <button type="submit" className=" text-md text-center bg-blue-700 hover:bg-blue-400 text-white hover:text-white py-2 rounded-lg font-semibold cursor-pointer">
+                        Log In
+                    </button>
                 </form>
+                <NavLink to="/forgot-password/verify-username" className="text-sm text-blue-900 mt-4 cursor-pointer">Forgot password?</NavLink>
             </div>
+            <div className="bg-white border border-gray-300 text-center w-80 py-4 rounded-md">
+                <span className="text-sm text-black">Don&apos;t have an account? </span>
+                <NavLink to="/sign-up" className="text-blue-900 text-sm font-semibold cursor-pointer">Sign up</NavLink>
+            </div>
+
         </>
     );
 }

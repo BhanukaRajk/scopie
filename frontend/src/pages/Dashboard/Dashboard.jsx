@@ -1,22 +1,62 @@
 // eslint-disable-next-line no-unused-vars
-import React from "react";
-
+import React, { useState, useEffect } from "react";
 import NewReleasesCard from "../../components/Cards/NewReleasesCard";
+import { getMovies } from "../../apis/movieAPI";
+
+import useUser from "../../hooks/useUser";
 
 const Dashboard = () => {
 
-    const movie = {
-        poster: "https://imgs.search.brave.com/DBArP3DuP1ka66lm8-5HYNoC6XKuMpic6kGY84f8IP4/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvMTQ4/NTE2NDAxNy9waG90/by9jaGF0LWRpc2N1/c3Npb24taWNvbi53/ZWJwP2I9MSZzPTE3/MDY2N2Emdz0wJms9/MjAmYz0yWm1iUmpY/Skl4MzlMTTVLbExB/T2hvSS0yV0Vsdkgt/TnJqWUE1MVlmeXdZ/PQ",
-        title: "Movie Title",
-        description: "Movie Description",
-    }
+    const { user } = useUser();
+    console.log(user);
+
+    // TODO: Remove this mock data
+    const movies = [
+        // {
+        //     poster: "https://webneel.com/daily/sites/default/files/images/daily/09-2019/25-movie-poster-design-jumanji-piqued.jpg",
+        //     title: "Jumanji",
+        //     description: "A horror and adventurous journey behind a person's life."
+        // }, {
+        //     poster: "https://webneel.com/daily/sites/default/files/images/daily/09-2019/25-movie-poster-design-jumanji-piqued.jpg",
+        //     title: "Jumanji",
+        //     description: "A horror and adventurous journey behind a person's life."
+        // }, {
+        //     poster: "https://webneel.com/daily/sites/default/files/images/daily/09-2019/25-movie-poster-design-jumanji-piqued.jpg",
+        //     title: "Jumanji",
+        //     description: "A horror and adventurous journey behind a person's life."
+        // },
+    ]
+
+    const [newReleases, setNewReleases] = useState([]);
+    useEffect(() => {
+        const fetchRecents = async () => {
+            try {
+                const response = await getMovies();
+                setNewReleases(response);
+            } catch {
+                console.log("error");
+            }
+        }
+        fetchRecents();
+    }), [];
 
     return (
         <>
-            <div className="flex flex-col gap-3 w-full m-3">
+            <div className="flex flex-col gap-3 mx-3">
+                <div className="mt-36 md:mt-0 w-full text-2xl text-black">Upcoming reservations</div>
+                <div className="flex flex-col sm:flex-row sm:justify-start sm:flex-wrap gap-5 w-full m-3">
+                    {movies.length === 0 ? <div className='text-lg text-center text-gray-400'> No movies to show </div> :
+                        movies.map((latest) => (
+                            <NewReleasesCard movie={latest} key={latest.id} />
+                        ))}
+                </div>
+
                 <div className="w-full text-2xl text-black">New releases</div>
-                <div className="flex flex-col md:flex-row md:justify-center gap-5 w-full md:w-20 m-3">
-                    <NewReleasesCard movie={movie}/>
+                <div className="flex flex-col sm:flex-row sm:justify-start sm:flex-wrap gap-5 w-full m-3">
+                    {newReleases.length === 0 ? <div className='text-lg text-center text-gray-400'> No recent releases to show </div> :
+                        newReleases.map((latest) => (
+                            <NewReleasesCard movie={latest} key={latest.id} />
+                        ))}
                 </div>
             </div>
         </>

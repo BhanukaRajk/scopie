@@ -4,23 +4,30 @@ import React, { useState } from "react";
 import SignupForm from "../../components/Forms/Authentications/SignupForm";
 import EmailVerificationForm from "../../components/Forms/Authentications/EmailVerificationForm";
 
-const Login = () => {
+const Signup = () => {
     const [isVerifyForm, setVerifyForm] = useState(false);
+
+    const onClose = () => {
+        setVerifyForm(false);
+    }
+
+    const onOpen = () => {
+        setVerifyForm(true);
+    }
+
 
     return (
         <>
-            <div className="flex justify-center w-full h-full bg-gray-300">
-                <div className="flex flex-col juctify-center w-full h-full">
-                    <div>
-                        <SignupForm />
-                    </div>
-                    <div className={`${isVerifyForm ? "block" : "hidden"} absolute z-10 bg-black opacity-25`}>
-                        <EmailVerificationForm isOpen={isVerifyForm} onClose={setVerifyForm} />
-                    </div>
+            <div className="h-screen w-screen bg-gray-50 flex flex-col justify-center items-center">
+                <SignupForm onOpen={onOpen}/>
+
+
+                <div className={`${isVerifyForm ? "block" : "hidden"}`}>
+                    <EmailVerificationForm isOpen={isVerifyForm} onClose={onClose} />
                 </div>
             </div>
         </>
     );
 }
 
-export default Login;
+export default Signup;

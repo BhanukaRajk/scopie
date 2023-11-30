@@ -2,65 +2,72 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 
-import { AiFillCloseCircle } from "react-icons/ai";
+import { verifyEmail } from "../../../apis/authAPI";
 
-import {
-    Button,
-    message,
-} from "antd";
+import { message } from "antd";
+import { NavLink } from "react-router-dom";
 
 // eslint-disable-next-line no-unused-vars
-const ForgotPasswordEmailForm = ({ isOpen, onClose }) => {
-    const [verifyEmail, setVerifyEmail] = useState("");
+const ForgotPasswordEmailForm = ({ onOpen, onClose }) => {
+    const [email, setVerifyEmail] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
 
     const handleEmailInput = async (event) => {
         event.preventDefault();
-        if (verifyEmail === "" || verifyEmail === null) {
+        if (email === "" || email === null) {
             messageApi.open({
                 type: 'error',
                 content: 'Please enter valid email address!',
             });
         } else {
-            // SET THE EMAIL VERIFICATION FORM TO OPEN
+            messageApi.open({
+                type: 'processing',
+                content: 'Processing...',
+            });
+            const isUserExist = (await verifyEmail(email)).data;
+            if(isUserExist) {
+                messageApi.open({
+                    type: 'success',
+                    content: 'You will receive an email shortly!',
+                });
+                onOpen();
+                sessionStorage.setItem("email", email);
+            } else {
+                messageApi.open({
+                    type: 'error',
+                    content: 'Username does not exist!',
+                });
+            }
         }
     }
 
     return (
         <>
-            {contextHolder}
+            {contextHolder} {/* FOR THE MESSAGE COMPONENT */}
 
-            <div className="flex flex-col p-8 rounded-lg bg-white text-center">
-                
-                <div className="absolute left-2 top-2">
-                    <AiFillCloseCircle />
-                </div>
-                
-                <form onSubmit={handleEmailInput}>
-                    <div className="w-full text-lg">Enter your email</div>
-                    <div className="w-full text-sm text-gray-700">
-                        We will sent an verification code to your your email shortly.<br />
+            <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-md">
+                <h1 className="text-black font-serif">Scopie</h1>
+                <form onSubmit={handleEmailInput} className="mt-4 w-64 flex flex-col">
+                    <div className="w-full text-center text-sm mb-3 text-gray-700">
+                        Enter your email address. We will send a verification code to your email shortly.<br />
                     </div>
-                    <div className="flex justify-center">
+                    <div className="mb-4">
                         <input
-                            type="text"
-                            placeholder="Email address"
-                            value={verifyEmail}
-                            onChange={setVerifyEmail}
-                        />
+                            type="email"
+                            id="email"
+                            name="userEmail"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                            placeholder="Email Address"
+                            onChange={(event) => setVerifyEmail(event.target.value)}
+                            required />
                     </div>
-                    <div>
-                        <Button type="primary" htmlType="submit" block>
-                            Proceed
-                        </Button>
-                    </div>
-                    <div>
-                        <Button type="link" block>
-                            Back to login
-                        </Button>
-                    </div>
+                    <button type="submit" className=" text-md text-center bg-blue-700 hover:bg-blue-400 text-white hover:text-white py-2 rounded-lg font-semibold cursor-pointer">
+                        Proceed
+                    </button>
                 </form>
+                <NavLink to="/login" className="text-sm text-blue-900 mt-4 cursor-pointer">Back to login</NavLink>
             </div>
+
         </>
     );
 }
@@ -68,6 +75,6 @@ const ForgotPasswordEmailForm = ({ isOpen, onClose }) => {
 export default ForgotPasswordEmailForm;
 
 ForgotPasswordEmailForm.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
 }

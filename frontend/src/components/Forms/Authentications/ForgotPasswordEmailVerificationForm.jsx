@@ -3,36 +3,30 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-import { signUp } from "../../../apis/authAPI";
+import { verifyUser } from "../../../apis/authAPI";
 
 import {
     message,
 } from "antd";
 
 // eslint-disable-next-line no-unused-vars
-const EmailVerificationForm = ({ isOpen, onClose }) => {
+const ForgotPasswordEmailVerificationForm = ({ isOpen, onClose }) => {
+
+    const navigate = useNavigate();
 
     const [verificationData, setVerificationData] = useState({
-        firstName: "",
-        lastName: "",
-        password: "",
         email: "",
         otp: "",
     });
+
     const [messageApi, contextHolder] = message.useMessage();
-    const navigate = useNavigate();
 
     const handleInputChange = (e) => {
         setVerificationData(() => ({
-            ...verificationData,
-            firstName: sessionStorage.getItem("firstName"),
-            lastName: sessionStorage.getItem("lastName"),
-            password: sessionStorage.getItem("password"),
-            email: sessionStorage.getItem("email"),
-            otp: e.target.value,
+            ...verificationData, email: sessionStorage.getItem("email"), otp: e.target.value,
         }));
     };
-    
+
     const handleOneTimePasswordInput = async (event) => {
         event.preventDefault();
         if (verificationData.otp.length != 6) {
@@ -42,15 +36,24 @@ const EmailVerificationForm = ({ isOpen, onClose }) => {
             });
         } else {
             try {
-                const response = await signUp(verificationData);
-                console.log(response) // TODO: REMOVE THIS LINE
-                await messageApi.open({
-                    type: 'success',
-                    content: 'Your account has been created!',
-                });
-                sessionStorage.removeItem("user_data");
-                onClose();
-                navigate("/login");
+                console.log(verificationData);
+                const response = await verifyUser(verificationData);
+                if (response.data.error != null) {
+                    messageApi.open({
+                        type: 'error',
+                        content: response.data.error
+                    })
+                } else {
+                    await messageApi.open({
+                        type: 'success',
+                        content: "Your email has been verified!"
+                    })
+                    onClose();
+                    navigate("/forgot-password/add-new-password")
+                }
+
+
+
             } catch (error) {
                 console.error(error);
                 messageApi.open({
@@ -102,9 +105,11 @@ const EmailVerificationForm = ({ isOpen, onClose }) => {
     );
 }
 
-export default EmailVerificationForm;
+export default ForgotPasswordEmailVerificationForm;
 
-EmailVerificationForm.propTypes = {
+ForgotPasswordEmailVerificationForm.propTypes = {
+    enteredEmail: PropTypes.string,
+
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
 }

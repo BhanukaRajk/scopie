@@ -8,10 +8,8 @@ const ForgetPassword = () => {
 
     return (
         <>
-            <div className="flex flex-col justify-center w-full h-full bg-gray-300">
-                <div className="flex justify-center w-full h-full">
-                    <ForgotPasswordResetForm isOpen={isResetForm} onClose={setResetForm} />
-                </div>
+            <div className="h-screen w-screen bg-gray-50 flex flex-col justify-center items-center">
+                <ForgotPasswordResetForm isOpen={isResetForm} onClose={setResetForm} />
             </div>
         </>
     );

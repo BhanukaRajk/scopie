@@ -14,7 +14,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 	<React.StrictMode>
 		<UserProvider>
 			<DrawerProvider>
-					<App />
+				<App />
 			</DrawerProvider>
 		</UserProvider>
 	</React.StrictMode>

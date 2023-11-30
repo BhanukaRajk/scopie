@@ -1,22 +1,29 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
 
-import EmailVerificationForm from "../../components/Forms/Authentications/EmailVerificationForm";
+import ForgetPasswordEmailVerificationForm from "../../components/Forms/Authentications/ForgotPasswordEmailVerificationForm";
 import ForgotPasswordEmailForm from "../../components/Forms/Authentications/ForgotPasswordEmailForm";
 
 const ForgetPassword = () => {
     const [isVerifyForm, setVerifyForm] = useState(false);
 
+    const onClose = () => {
+        setVerifyForm(false);
+    }
+
+    const onOpen = () => {
+        setVerifyForm(true);
+    }
+
     return (
         <>
-            <div className="flex flex-col justify-center w-full h-full bg-gray-300">
-                <div className="flex justify-center w-full h-full">
-                    <ForgotPasswordEmailForm />
-                </div>
-            </div>
+            <div className="h-screen w-screen bg-gray-50 flex flex-col justify-center items-center">                
+                <ForgotPasswordEmailForm onOpen={onOpen} onClose={onClose} />
 
-            <div className={`${isVerifyForm ? "block" : "hidden"} w-full h-full bg-black opacity-25`}>
-                <EmailVerificationForm isOpen={isVerifyForm} onClose={setVerifyForm} />
+
+                <div className={`${isVerifyForm ? "block" : "block"}`}>
+                    <ForgetPasswordEmailVerificationForm isOpen={isVerifyForm} onClose={onClose} />
+                </div>
             </div>
         </>
     );
