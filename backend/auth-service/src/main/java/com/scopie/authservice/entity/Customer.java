@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "customer")
+@Table(name = "t_customer")
 public class Customer {
 
     @Id
@@ -27,6 +27,5 @@ public class Customer {
 
     @Column(name = "password", nullable = false)
     private String password;
-
 
 }

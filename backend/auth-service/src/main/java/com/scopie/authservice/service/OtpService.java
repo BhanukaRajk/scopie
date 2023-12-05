@@ -4,10 +4,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface OtpService {
-    public String generateOtp(String key);
-    public String getOtp(String key);
-    public boolean validateOtp(String key, String enteredOTP);
-
-    public boolean compareOtp(String email, String enteredOTP);
-    public String createOtp(String email);
+    String storeOtpOnRedis(String key);
+    boolean validateOtp(String key, String enteredOTP);
+    boolean compareOtp(String email, String enteredOTP);
+    String storeOtp(String email);
+    String generateOtp();
 }

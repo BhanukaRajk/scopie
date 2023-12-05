@@ -2,7 +2,11 @@
 import React from "react";
 
 const Reservation = () => {
-    return <> MovePage </>
+    return (<>
+        <div>
+            
+        </div>
+    </>)
 }
 
 export default Reservation;

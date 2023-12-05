@@ -1,7 +1,6 @@
 package com.scopie.authservice.config;
 
 import com.scopie.authservice.dto.LoginDTO;
-import com.scopie.authservice.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +19,7 @@ public class JwtGeneratorImpl implements JwtGenerator {
     @Override
     public Map<String, String> generate(LoginDTO user) { // MAP THE JWT TOKEN IN TO STRING
 
-        String jwtToken = "";
+        String jwtToken;
         String secret = "4c6272525a5a7a7042583943586b63476f694f4d6562776a455435335075424da";
 
         jwtToken = Jwts.builder()
@@ -35,7 +34,7 @@ public class JwtGeneratorImpl implements JwtGenerator {
         jwtTokenGen.put("token", jwtToken);
         jwtTokenGen.put("tokenType", "Bearer");
         jwtTokenGen.put("expiresIn", "1000*60*60");
-        jwtTokenGen.put("role", "['CUSTOMER', 'ADMIN']");
+        jwtTokenGen.put("role", "CUSTOMER");
 
         return jwtTokenGen; // RETURN THE JWT TOKEN
     }

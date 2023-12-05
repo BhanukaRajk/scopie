@@ -55,7 +55,7 @@ const LoginForm = () => {
         } else {
             try {
                 const response = await login(credentials);
-                console.log(response); // GET RESPONSE AS OK AND THEN NAVIGATE
+                console.log(response);
                 if (response.data.error != null) {
                     
                     messageApi.open({

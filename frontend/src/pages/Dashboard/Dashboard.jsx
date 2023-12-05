@@ -5,6 +5,8 @@ import { getMovies } from "../../apis/movieAPI";
 
 import useUser from "../../hooks/useUser";
 
+import Footer from "../components/Common/Footer";
+
 const Dashboard = () => {
 
     const { user } = useUser();
@@ -59,6 +61,7 @@ const Dashboard = () => {
                         ))}
                 </div>
             </div>
+            <Footer />
         </>
     );
 }

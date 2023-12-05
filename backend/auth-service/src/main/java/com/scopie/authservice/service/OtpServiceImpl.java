@@ -1,15 +1,20 @@
 package com.scopie.authservice.service;
 
-import com.scopie.authservice.dto.OtpDTO;
 import com.scopie.authservice.entity.UserOtp;
 import com.scopie.authservice.repository.UserOtpRepository;
+import org.hibernate.annotations.CurrentTimestamp;
+import org.hibernate.generator.internal.CurrentTimestampGeneration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Random;
 
 @Component
@@ -23,21 +28,11 @@ public class OtpServiceImpl implements OtpService {
 
     @Autowired
     private UserOtpRepository userOtpRepository;
-    @Autowired
-    private ModelMapper modelMapper;
 
+    // STORE THE OTP ON REDIS WITH EXPIRATION TIME
+    public String storeOtpOnRedis(String key) {
 
-    public String generateOtp(String key) {
-        Random random = new Random();
-
-        int leftLimit = 48; // CHARACTER '0'
-        int rightLimit = 57; // CHARACTER '9'
-        int targetStringLength = 6; // LENGTH OF OTP
-
-        String generatedString = random.ints(leftLimit, rightLimit + 1)
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
+        String generatedString = generateOtp();
 
         // DELETE THE OLD OTP IF EXISTS
         if(Boolean.TRUE.equals(stringRedisTemplate.hasKey(key))) {
@@ -60,39 +55,39 @@ public class OtpServiceImpl implements OtpService {
         }
     }
 
-    public String createOtp(String email) {
+    // STORE OTP ON MYSQL DATABASE
+    public String storeOtp(String email) {
+
+        String otp = generateOtp();
+        UserOtp userOtp = new UserOtp();
+
+        userOtp.setEmailAndOtp(email, otp);
+
+        // DELETE THE OLD OTP IF EXISTS
+        userOtpRepository.deleteByEmail(email);
+        userOtpRepository.save(userOtp);
+        return otp;
+    }
+
+    // TODO: REMOVE THE OTP CODE FROM THE DATABASE IF REQUIRED
+    // COMPARE GENERATED OTP AND USER INPUT OTP
+    public boolean compareOtp(String email, String enteredOTP) {
+        UserOtp cacheOtp = userOtpRepository.findOtpByEmail(email);
+        return enteredOTP.equals(cacheOtp.getOtp()) && cacheOtp.getDuration().toMinutes() < 5;
+    }
+
+    // STRING OTP GENERATOR
+    public String generateOtp() {
         Random random = new Random();
 
         int leftLimit = 48; // CHARACTER '0'
         int rightLimit = 57; // CHARACTER '9'
         int targetStringLength = 6; // LENGTH OF OTP
 
-        String otp = random.ints(leftLimit, rightLimit + 1)
+        return random.ints(leftLimit, rightLimit + 1)
                 .limit(targetStringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
-
-        // DELETE THE OLD OTP IF EXISTS
-        UserOtp userOtp = new UserOtp(null, email, otp);
-        userOtpRepository.deleteByEmail(email);
-        userOtpRepository.save(userOtp);
-        return otp;
-    }
-
-    public boolean compareOtp(String email, String enteredOTP) {
-        String cacheOtp = userOtpRepository.findOtpByEmail(email);
-        System.out.println("cacheOtp: " + cacheOtp);
-        if(enteredOTP.equals(cacheOtp)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    // GET OTP FROM REDIS TO COMPARE
-    public String getOtp(String key) { // KEY IS EMAIL
-        return stringRedisTemplate.opsForValue().get(key);
     }
 
 }

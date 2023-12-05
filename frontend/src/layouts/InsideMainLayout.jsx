@@ -5,7 +5,6 @@ import useUser from "../hooks/useUser";
 
 import SideNavBar from "../components/Common/SideNavBar";
 import TopNavBar from "../components/Common/TopNavBar";
-import Footer from "../components/Common/Footer";
 
 const InsideMainLayout = () => {
     const navigate = useNavigate();
@@ -24,7 +23,6 @@ const InsideMainLayout = () => {
                 <TopNavBar />
                 <Outlet />
                 <SideNavBar />
-                <Footer />
             </div>
         </>
     );

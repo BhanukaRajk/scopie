@@ -8,11 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface UserOtpRepository extends JpaRepository<UserOtp, String> {
 
-    @Query(value = "SELECT otp FROM user_otp WHERE email = ?1", nativeQuery = true)
-    String findOtpByEmail(String email);
+    @Query(value = "SELECT * FROM x_usr_otp WHERE email = ?1", nativeQuery = true)
+    UserOtp findOtpByEmail(String email);
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM user_otp WHERE email = ?1", nativeQuery = true)
+    @Query(value = "DELETE FROM x_usr_otp WHERE email = ?1", nativeQuery = true)
     void deleteByEmail(String email);
+
 }

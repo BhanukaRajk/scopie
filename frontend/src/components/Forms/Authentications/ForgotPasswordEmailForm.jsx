@@ -14,28 +14,50 @@ const ForgotPasswordEmailForm = ({ onOpen, onClose }) => {
 
     const handleEmailInput = async (event) => {
         event.preventDefault();
+
         if (email === "" || email === null) {
             messageApi.open({
                 type: 'error',
-                content: 'Please enter valid email address!',
+                content: 'Please enter a valid email address!',
             });
         } else {
-            messageApi.open({
-                type: 'processing',
-                content: 'Processing...',
-            });
-            const isUserExist = (await verifyEmail(email)).data;
-            if(isUserExist) {
+            try {
                 messageApi.open({
-                    type: 'success',
-                    content: 'You will receive an email shortly!',
+                    type: 'loading',
+                    content: 'Processing...',
+                    duration: 2,
                 });
-                onOpen();
-                sessionStorage.setItem("email", email);
-            } else {
+
+                const response = await verifyEmail(email);
+
+                if (response.status === 400) {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Please enter a valid email address!',
+                    });
+                } else if (response.status === 404) {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Username does not exist!',
+                    });
+                } else if (response.status === 202) {
+                    sessionStorage.setItem("email", email);
+                    onOpen();
+                    messageApi.open({
+                        type: 'success',
+                        content: 'You will receive an email shortly!',
+                    });
+                } else {  // VERIFICATION CODE SENDING FAILED
+                    messageApi.open({
+                        type: 'error',
+                        content: response.body, // USE DATA INSTEAD OF BODY
+                    });
+                }
+            } catch (error) {
+                console.error(error);
                 messageApi.open({
                     type: 'error',
-                    content: 'Username does not exist!',
+                    content: 'Something went wrong!',
                 });
             }
         }

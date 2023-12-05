@@ -1,19 +1,24 @@
 package com.scopie.authservice.service;
 
-import com.scopie.authservice.dto.SignupDTO;
+import com.scopie.authservice.dto.PasswordChangeDTO;
+import com.scopie.authservice.dto.ProfileUpdateDTO;
 import com.scopie.authservice.dto.ValidationDTO;
 import com.scopie.authservice.entity.Customer;
-import com.scopie.authservice.entity.User;
 
 public interface AuthService {
 
 
-    public String authenticateUser(String username, String password);
+    String authenticateUser(String username, String password);
 
-    public Customer findByUsername(String username);
+    Customer findByUsername(String username);
 
-    public void signUp(ValidationDTO signupDTO);
+    void signUp(ValidationDTO signupDTO);
 
-    public void changePassword(String username, String password);
+    void changePassword(String username, String password);
 
+    void updateAccName(ProfileUpdateDTO updatedName);
+
+    boolean updatePassword(PasswordChangeDTO updatedPasswords);
+
+    public ProfileUpdateDTO getUserDetails(String username);
 }

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-import { verifyUser } from "../../../apis/authAPI";
+import { verifyUser, resendCode } from "../../../apis/authAPI";
 
 import {
     message,
@@ -26,6 +26,27 @@ const ForgotPasswordEmailVerificationForm = ({ isOpen, onClose }) => {
             ...verificationData, email: sessionStorage.getItem("email"), otp: e.target.value,
         }));
     };
+
+    const handleResend = async (resend) => {
+        resend.preventDefault();
+        messageApi.open({
+            type: 'loading',
+            content: 'Processing...',
+            duration: 2,
+        });
+        try {
+            await resendCode(sessionStorage.getItem("email"));
+            messageApi.open({
+                type: 'success',
+                content: 'You will receive an email shortly!',
+            });
+        } catch (error) {
+            messageApi.open({
+                type: 'error',
+                content: error.message,
+            });
+        }
+    }
 
     const handleOneTimePasswordInput = async (event) => {
         event.preventDefault();
@@ -96,6 +117,9 @@ const ForgotPasswordEmailVerificationForm = ({ isOpen, onClose }) => {
                                 Verify
                             </button>
                         </form>
+                        <div className=" text-xs text-black my-2">
+                            Didn&apos;t get the code? <a onClick={handleResend} className=" text-blue-900 mt-4 cursor-pointer">Resend</a>
+                        </div>
                         <a className="text-black mt-4 text-sm cursor-pointer" onClick={onClose}>Cancel</a>
                     </div>
 
