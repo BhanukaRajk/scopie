@@ -53,7 +53,8 @@ public class AuthServiceImpl implements AuthService {
                 validationDTO.getFirstName(),
                 validationDTO.getLastName(),
                 validationDTO.getEmail(),
-                passwordEncoder.encode(validationDTO.getPassword())
+                passwordEncoder.encode(validationDTO.getPassword()),
+                null
         );
         customerRepo.save(newCustomer);
     }

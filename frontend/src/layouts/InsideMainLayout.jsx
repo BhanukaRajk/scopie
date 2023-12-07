@@ -1,8 +1,9 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect} from "react";
+import React, { useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import useUser from "../hooks/useUser";
 
+import { Skeleton } from 'antd';
 import SideNavBar from "../components/Common/SideNavBar";
 import TopNavBar from "../components/Common/TopNavBar";
 
@@ -16,16 +17,21 @@ const InsideMainLayout = () => {
         }
     }, [user, navigate]);
 
-
-    return (
-        <>
-            <div className="flex flex-col w-screen">
-                <TopNavBar />
-                <Outlet />
-                <SideNavBar />
-            </div>
-        </>
-    );
+    if (!user) {
+        return (
+            <Skeleton active />
+        );
+    } else {
+        return (
+            <>
+                <div className="flex flex-col w-screen">
+                    <TopNavBar />
+                    <Outlet />
+                    <SideNavBar />
+                </div>
+            </>
+        );
+    }
 }
 
 export default InsideMainLayout;

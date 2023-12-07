@@ -3,6 +3,8 @@ package com.scopie.authservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -27,5 +29,8 @@ public class Customer {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    private List<Reservation> reservations;
 
 }

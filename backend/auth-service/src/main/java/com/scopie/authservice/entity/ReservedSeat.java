@@ -19,8 +19,9 @@ public class ReservedSeat {
     @Column(name = "movie_time_id", nullable = false)
     private Integer movieTimeId;
 
-    @Column(name = "reservation_id", nullable = false)
-    private Integer reservationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "reservation_id", name = "reservation_id", nullable = false)
+    private Reservation reservationId;
 
     @Column(name = "seat_id", nullable = false)
     private Integer seatId;

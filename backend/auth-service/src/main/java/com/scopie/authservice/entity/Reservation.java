@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,8 +20,9 @@ public class Reservation {
     @Column(name = "reservation_id")
     private Integer reservationId;
 
-    @Column(name = "customer", nullable = false)
-    private String customer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "customer_id", name = "customer", nullable = false)
+    private Customer customer;
 
     @Column(name = "total_price", nullable = false)
     private Double totalPrice;
@@ -30,4 +32,7 @@ public class Reservation {
 
     @Column(name = "acceptance", nullable = false)
     private boolean acceptance;
+
+    @OneToMany(mappedBy = "reservationId", fetch = FetchType.LAZY)
+    private List<ReservedSeat> seats;
 }

@@ -1,11 +1,12 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
+import { Empty } from "antd";
 import NewReleasesCard from "../../components/Cards/NewReleasesCard";
 import { getMovies } from "../../apis/movieAPI";
 
 import useUser from "../../hooks/useUser";
 
-import Footer from "../components/Common/Footer";
+import Footer from "../../components/Common/Footer";
 
 const Dashboard = () => {
 
@@ -47,7 +48,7 @@ const Dashboard = () => {
             <div className="flex flex-col gap-3 mx-3">
                 <div className="mt-36 md:mt-0 w-full text-2xl text-black">Upcoming reservations</div>
                 <div className="flex flex-col sm:flex-row sm:justify-start sm:flex-wrap gap-5 w-full m-3">
-                    {movies.length === 0 ? <div className='text-lg text-center text-gray-400'> No movies to show </div> :
+                    {movies.length === 0 ? <Empty /> :
                         movies.map((latest) => (
                             <NewReleasesCard movie={latest} key={latest.id} />
                         ))}
@@ -55,7 +56,7 @@ const Dashboard = () => {
 
                 <div className="w-full text-2xl text-black">New releases</div>
                 <div className="flex flex-col sm:flex-row sm:justify-start sm:flex-wrap gap-5 w-full m-3">
-                    {newReleases.length === 0 ? <div className='text-lg text-center text-gray-400'> No recent releases to show </div> :
+                    {newReleases.length === 0 ? <Empty /> :
                         newReleases.map((latest) => (
                             <NewReleasesCard movie={latest} key={latest.id} />
                         ))}
