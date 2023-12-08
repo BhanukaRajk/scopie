@@ -39,28 +39,31 @@ public class AuthController {
     @Autowired
     private EmailService emailService;
 
-    private ValidationController validator;
+    private ValidationController validator = new ValidationController();
 
     // LOGIN FUNCTIONALITY
     @PostMapping ("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDTO credentials) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginDTO credentials) {
 
         if (validator.emailValidator(credentials.getUsername())) {
             try {
                 if(Objects.equals(authService.authenticateUser(credentials.getUsername(), credentials.getPassword()), "false")) {
 //                    return Map.of("error", "Invalid username or password!");
-                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid username or password!");
+                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(Map.of("error", "Invalid username or password!"));
+//                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid username or password!");
                 } else {
 //                    return new JwtGeneratorImpl().generate(credentials);
-                    return ResponseEntity.status(HttpStatus.CREATED).body(new JwtGeneratorImpl().generate(credentials).toString());
+                    return ResponseEntity.status(HttpStatus.CREATED).body(new JwtGeneratorImpl().generate(credentials));
                 }
             } catch (Exception e) {
 //                return Map.of("error", e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
             }
         } else {
 //            return Map.of("error", "Please enter xxx@xxx.xx format!");
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Please enter xxx@xxx.xx format!");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(Map.of("error", "Please enter xxx@xxx.xx format!"));
+//            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Please enter xxx@xxx.xx format!");
         }
 
     }

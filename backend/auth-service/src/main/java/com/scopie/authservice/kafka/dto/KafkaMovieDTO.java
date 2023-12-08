@@ -1,9 +1,5 @@
-package com.scopie.authservice.dto;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+package com.scopie.authservice.kafka.dto;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Time;
@@ -12,10 +8,10 @@ import java.sql.Time;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MovieDTO {
+public class KafkaMovieDTO {
     private long  movieId;
     private String title;
-    private String banner;
+    private MultipartFile banner;
     private String genre;
     private String language;
     private Time duration;

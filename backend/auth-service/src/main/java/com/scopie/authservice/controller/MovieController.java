@@ -40,8 +40,7 @@ public class MovieController {
 
     // SEND THE SPECIFIC MOVIE DETAILS WHEN CUSTOMER CLICKS ON SOME MOVIE
     @GetMapping(value = "/:id")
-    public ResponseEntity<String> expandSpecificMovie(@RequestParam Integer movieId) {
-        // TODO: THERE SHOULD BE MOVIE TIME AND THE CINEMA HALLS ALSO CONCAT THOSE VALUES
+    public ResponseEntity<String> expandSpecificMovie(@RequestParam Long movieId) {
         return ResponseEntity.status(HttpStatus.OK).body(movieService.movieDetails(movieId).toString());
     }
 

@@ -5,6 +5,7 @@ import com.scopie.authservice.entity.Reservation;
 import com.scopie.authservice.repository.ReservationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,32 +18,37 @@ public class ReservationServiceImpl implements ReservationService {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    KafkaTemplate<String, String> kafkaTemplate;
+
     // RESERVATION PRICE CALCULATOR
     public Double priceCalculator(Integer seatCount, Double seatType) {
         return seatCount*seatType;
     }
 
-    public void reservationRequest() {
-        // SEND REQUEST USING KAFKA
-    }
 
     // ACCEPT USING CHANGE THE COLUMN VALUE OF ACCEPTANCE
-    public void reservationAcceptor(Integer reservationId, boolean allowance) {
+    public void reservationAcceptor(Long reservationId, boolean allowance) {
         reservationRepository.updateAcceptance(reservationId, allowance);
     }
 
+    // CREATE NEW RESERVATION IN DATABASE AS WELL AS CINEMA SIDE
     public void newReservation(ReservationDTO reservationDTO) {
         Double total = priceCalculator(100, 2000.00); // TODO: CHANGE THESE VALUES WITH CUSTOMER REQUESTS
-        // TODO: SEND THE DATA TO CINEMA SIDE VIA KAFKA
         reservationRepository.save(modelMapper.map(reservationDTO, Reservation.class));
+        // TODO: SEND THE DATA TO CINEMA SIDE VIA KAFKA
+        kafkaTemplate.send("NewReservations", reservationDTO.toString());
     }
 
-    public Optional<Reservation> getReservationById(Integer reservationId) {
+    public Optional<Reservation> getReservationById(Long reservationId) {
         return reservationRepository.findById(reservationId);
     }
 
-    public void cancelReservation(Integer reservationId) {
+    // CANCEL THE RESERVATION FROM DATABASE AS WELL AS CINEMA SIDE
+    public void cancelReservation(Long reservationId) {
         reservationRepository.deleteById(reservationId);
+        // TODO: PASS THE CANCELLING RESERVATION ID TO THE CINEMA SIDE
+        kafkaTemplate.send("CancelReservation", reservationId.toString());
     }
 
 }

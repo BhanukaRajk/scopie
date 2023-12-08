@@ -17,7 +17,7 @@ public class UserOtp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "otp_id", nullable = false)
-    private Integer otpId;
+    private Long otpId;
 
     @Column(name = "email", nullable = false)
     private String email;

@@ -1,13 +1,10 @@
 package com.scopie.authservice.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@AllArgsConstructor
 @Getter
-@Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class PaymentDTO {
     public String userName;

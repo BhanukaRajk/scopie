@@ -19,6 +19,11 @@ public class KafkaTopicConfig {
     }
 
     @Bean
+    public NewTopic newReservationsTopic() {
+        return TopicBuilder.name("NewReservations").build();
+    }
+
+    @Bean
     public NewTopic reservationTopic() {
         return TopicBuilder.name("reservation_details").build();
     }

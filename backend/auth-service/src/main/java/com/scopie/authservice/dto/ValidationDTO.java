@@ -1,14 +1,11 @@
 package com.scopie.authservice.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 public class ValidationDTO {
     private String firstName;
     private String lastName;

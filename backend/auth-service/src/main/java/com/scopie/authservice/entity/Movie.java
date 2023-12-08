@@ -2,23 +2,23 @@ package com.scopie.authservice.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Duration;
 
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "t_movie")
 public class Movie {
 
     @Id
     @Column(name = "movie_id")
-    private Integer movieId;
+    private Long movieId;
 
     @Column(name = "banner")
     private String banner;
@@ -32,6 +32,6 @@ public class Movie {
     @Column(name = "language")
     private String language;
 
-    @Column(name = "title")
+    @Column(name = "title", nullable = false)
     private String title;
 }

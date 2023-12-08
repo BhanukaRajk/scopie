@@ -1,4 +1,4 @@
-package com.scopie.authservice.dto;
+package com.scopie.authservice.kafka.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,11 +12,9 @@ import java.sql.Time;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MovieDTO {
-    private long  movieId;
-    private String title;
-    private String banner;
-    private String genre;
-    private String language;
-    private Time duration;
+public class KafkaCinemaDTO {
+    private long  cinemaId;
+    private String cinemaName;
+    private String address;
+    private String contact;
 }

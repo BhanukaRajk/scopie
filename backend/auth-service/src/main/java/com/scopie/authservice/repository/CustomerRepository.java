@@ -9,10 +9,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 
-public interface CustomerRepository extends JpaRepository<Customer, Integer> {
+public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     @Query(value = "SELECT * FROM t_customer WHERE email = ?1", nativeQuery = true) // ?1 IS THE FIRST PARAMETER
-    public Customer findByEmail(String email);
+    Customer findByEmail(String email);
 
     @Transactional
     @Modifying

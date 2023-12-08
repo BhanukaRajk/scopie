@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface UserOtpRepository extends JpaRepository<UserOtp, String> {
+public interface UserOtpRepository extends JpaRepository<UserOtp, Long> {
 
     @Query(value = "SELECT * FROM x_usr_otp WHERE email = ?1", nativeQuery = true)
     UserOtp findOtpByEmail(String email);
