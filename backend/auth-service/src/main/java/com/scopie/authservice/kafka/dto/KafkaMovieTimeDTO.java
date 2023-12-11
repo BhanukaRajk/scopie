@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class KafkaMovieTimeDTO {
     private long  movieTimeId;
     private long  timeSlotId;
+    private long cinemaId;
     private long  movieId;
     private int seatCount;
 }

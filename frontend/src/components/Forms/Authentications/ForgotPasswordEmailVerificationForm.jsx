@@ -95,7 +95,7 @@ const ForgotPasswordEmailVerificationForm = ({ isOpen, onClose }) => {
                 <div className="fixed left-0 right-0 bottom-0 top-0 z-40 opacity-30 bg-black"></div>
                 <div className="fixed top-16 bottom-0 right-0 left-0 z-40 flex flex-col items-center justify-center">
 
-                    <div className="bg-white border border-gray-300 z-50 w-80 p-8 flex items-center flex-col mb-3 rounded-md shadow-lg">
+                    <div className="bg-white border border-gray-300 z-50 w-80 p-8 flex items-center flex-col mb-3 rounded-lg shadow-lg">
                         <form onSubmit={handleOneTimePasswordInput} className=" w-64 flex flex-col text-center">
                             <div className="w-full mb-2 text-xl text-black">Enter verification code</div>
                             <div className="w-full text-sm text-gray-700">

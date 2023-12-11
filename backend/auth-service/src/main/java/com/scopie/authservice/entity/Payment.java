@@ -22,8 +22,9 @@ public class Payment {
     @Column(name = "payment_id")
     private Long paymentId;
 
-    @Column(name = "reservation_id", unique = true, nullable = false)
-    private Integer reservationId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "reservation_id", name = "reservation", nullable = false)
+    private Reservation reservation;
 
     @Column(name= "payment_date", nullable = false)
     @CreationTimestamp

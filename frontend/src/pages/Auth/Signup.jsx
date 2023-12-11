@@ -18,7 +18,7 @@ const Signup = () => {
 
     return (
         <>
-            <div className="h-screen w-screen bg-gray-50 flex flex-col justify-center items-center">
+            <div className="h-screen w-screen login-background flex flex-col justify-center items-center">
                 <SignupForm onOpen={onOpen}/>
 
 

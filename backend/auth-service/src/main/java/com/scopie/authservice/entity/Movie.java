@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Time;
+import java.util.List;
 
 @Builder
 @Data
@@ -34,4 +35,8 @@ public class Movie {
 
     @Column(name = "title", nullable = false)
     private String title;
+
+
+    @OneToMany(mappedBy = "movieId", fetch = FetchType.LAZY)
+    private List<MovieTime> movieTimes;
 }

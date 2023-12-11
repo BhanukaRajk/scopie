@@ -8,14 +8,10 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaTopicConfig {
 
+    // FROM CUSTOMER SIDE
     @Bean
-    public NewTopic movieTopic() {
-        return TopicBuilder.name("test").build();
-    }
-
-    @Bean
-    public NewTopic newMovieTopic() {
-        return TopicBuilder.name("MovieAdd").build();
+    public NewTopic newSeatReservation() {
+        return TopicBuilder.name("NewSeatReserve").build();
     }
 
     @Bean
@@ -24,8 +20,30 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic reservationTopic() {
-        return TopicBuilder.name("reservation_details").build();
+    public NewTopic newReservationRemoveTopic() {
+        return TopicBuilder.name("NewReserveCancellation").build();
+    }
+
+
+    // FROM CINEMA SIDE
+    @Bean
+    public NewTopic newMovieTopic() {
+        return TopicBuilder.name("MovieAdd").build();
+    }
+
+    @Bean
+    public NewTopic newMovieTimeTopic() {
+        return TopicBuilder.name("MovieTimeAdd").build();
+    }
+
+    @Bean
+    public NewTopic newCinemaTopic() {
+        return TopicBuilder.name("CinemaAdd").build();
+    }
+
+    @Bean
+    public NewTopic newSeatAdditionTopic() {
+        return TopicBuilder.name("SeatAdd").build();
     }
 
 }

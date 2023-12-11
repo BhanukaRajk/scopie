@@ -18,17 +18,16 @@ public class ReservedSeat {
     @Column(name = "reserved_seat_id")
     private Long reservedSeatId;
 
-    @Column(name = "movie_time_id", nullable = false)
-    private Integer movieTimeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "movie_time_id", name = "movie_time_id", nullable = false)
+    private MovieTime movieTimeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "reservation_id", name = "reservation_id", nullable = false)
     private Reservation reservationId;
 
-    @Column(name = "seat_id", nullable = false)
-    private Integer seatId;
-
-//    @Column(name = "booking_status", nullable = false) // BOOKED OR NOT
-//    private boolean bookingStatus;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "seat_id", name = "seat_id", nullable = false)
+    private Seat seatId;
 
 }

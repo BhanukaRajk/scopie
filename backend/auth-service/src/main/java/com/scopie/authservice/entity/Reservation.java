@@ -34,9 +34,9 @@ public class Reservation {
     @CreationTimestamp
     private Date date;
 
-//    @Column(name = "acceptance", nullable = false)
-//    private boolean acceptance;
-
     @OneToMany(mappedBy = "reservationId", fetch = FetchType.LAZY)
-    private List<ReservedSeat> seats;
+    private List<ReservedSeat> reservedSeats;
+
+    @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)
+    private Payment payment;
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Duration;
+import java.util.List;
 
 @Builder
 @Data
@@ -17,20 +18,26 @@ import java.time.Duration;
 public class MovieTime {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "movie_time_id", nullable = false)
     private Long movieTimeId;
 
-    @Column(name = "movie_id", nullable = false)
-    private Integer movieId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "movie_id", name = "movie_id", nullable = false)
+    private Movie movieId;
 
-    @Column(name = "cinema_id")
-    private Integer id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "cinema_id", name = "cinema_id", nullable = false)
+    private Cinema cinemaId;
 
-    @Column(name = "time_slot")
-    private Integer slotId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "slot_id", name = "time_slot", nullable = false)
+    private TimeSlot slotId;
 
     @Column(name = "seat_count", nullable = false)
     private String seatCount;
+
+
+    @OneToMany(mappedBy = "movieTimeId", fetch = FetchType.LAZY)
+    private List<ReservedSeat> reservedSeats;
 
 }

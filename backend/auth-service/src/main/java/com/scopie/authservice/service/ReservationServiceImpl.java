@@ -1,13 +1,17 @@
 package com.scopie.authservice.service;
 
+import com.scopie.authservice.dto.PaymentDTO;
 import com.scopie.authservice.dto.ReservationDTO;
+import com.scopie.authservice.entity.Payment;
 import com.scopie.authservice.entity.Reservation;
+import com.scopie.authservice.repository.PaymentRepository;
 import com.scopie.authservice.repository.ReservationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.naming.CannotProceedException;
 import java.util.Optional;
 
 @Service
@@ -17,6 +21,9 @@ public class ReservationServiceImpl implements ReservationService {
     
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     KafkaTemplate<String, String> kafkaTemplate;
@@ -50,5 +57,17 @@ public class ReservationServiceImpl implements ReservationService {
         // TODO: PASS THE CANCELLING RESERVATION ID TO THE CINEMA SIDE
         kafkaTemplate.send("CancelReservation", reservationId.toString());
     }
+
+    // COMPLETE THE PAYMENT
+   public void doPayment(PaymentDTO payment) throws CannotProceedException {
+       try {
+           paymentRepository.save(Payment.builder()
+                   .reservation(reservationRepository.getReferenceById(payment.getReservationId()))
+                   .build()
+           ); // TODO: CHECK THIS WORKING OR NOT?
+       } catch (Exception e) {
+           throw new CannotProceedException("Could not update the database!");
+       }
+   }
 
 }

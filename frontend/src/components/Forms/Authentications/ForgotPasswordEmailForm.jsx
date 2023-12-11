@@ -67,7 +67,7 @@ const ForgotPasswordEmailForm = ({ onOpen, onClose }) => {
         <>
             {contextHolder} {/* FOR THE MESSAGE COMPONENT */}
 
-            <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-md">
+            <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-lg">
                 <h1 className="text-black font-serif">Scopie</h1>
                 <form onSubmit={handleEmailInput} className="mt-4 w-64 flex flex-col">
                     <div className="w-full text-center text-sm mb-3 text-gray-700">

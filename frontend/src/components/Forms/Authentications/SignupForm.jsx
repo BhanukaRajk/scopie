@@ -86,13 +86,13 @@ const SignUpForm = ({ onOpen }) => {
         <>
             {contextHolder}
 
-            <div className="bg-white border text-black border-gray-300 w-96 py-8 flex items-center flex-col mb-3 rounded-md">
+            <div className="bg-white border text-black border-gray-300 w-96 py-8 flex items-center flex-col mb-3 rounded-lg">
                 <h1 className="text-black font-serif">Scopie</h1>
                 <div className="text-lg">Create new account</div>
                 <form onSubmit={handleSignUp} className="mt-8 w-10/12 flex flex-col">
-                    <div className="grid gap-6 mb-4 lg:grid-cols-2">
+                    <div className="grid gap-6 mb-4 sm:grid-cols-2">
                         <div>
-                            <input type="text" id="first_name" name="firstName" onChange={handleInputChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="First Name*" />
+                            <input type="text" id="first_name" name="firstName" onChange={handleInputChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  " placeholder="First Name*" />
                         </div>
                         <div>
                             <input type="text" id="last_name" name="lastName" onChange={handleInputChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Last Name" />
@@ -112,7 +112,7 @@ const SignUpForm = ({ onOpen }) => {
                     </button>
                 </form>
             </div>
-            <div className="bg-white border border-gray-300 text-center w-96 py-4 rounded-md">
+            <div className="bg-white border border-gray-300 text-center w-96 py-4 rounded-lg">
                 <span className="text-sm text-black">Already have an account? </span>
                 <NavLink to="/login" className="text-blue-900 text-sm font-semibold cursor-pointer">Log In</NavLink>
             </div>

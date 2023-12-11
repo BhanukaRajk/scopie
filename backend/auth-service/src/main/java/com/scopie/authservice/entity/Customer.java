@@ -30,7 +30,8 @@ public class Customer {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+
+    @OneToMany(mappedBy = "customerId", fetch = FetchType.LAZY) // USE THE ATTRIBUTE NAME (NOT THE COLUMN NAME)
     private List<Reservation> reservations;
 
 }

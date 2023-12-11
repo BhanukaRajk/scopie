@@ -2,7 +2,7 @@ import api from "./api";
 
 // GET ALL THE MOVIES FROM THE LIST
 export const getMovies = () => {
-    return api.get("/movies");
+    return api.get("/movies/");
 }
 
 // GET MOVIE BY USING FILTERS

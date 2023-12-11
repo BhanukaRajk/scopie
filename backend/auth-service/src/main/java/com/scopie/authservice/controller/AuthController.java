@@ -10,7 +10,9 @@ import com.scopie.authservice.service.OtpService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,13 +43,47 @@ public class AuthController {
 
     private ValidationController validator = new ValidationController();
 
+
+    @PostMapping("/signin")
+    public ResponseEntity<Map<String, String>> signin(@RequestBody LoginDTO credentials) {
+        if (validator.emailValidator(credentials.getUsername())) {
+            try {
+                String authenticationResult = authService.authenticateUser(credentials.getUsername(), credentials.getPassword());
+                if (Objects.equals(authenticationResult, "false")) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid username or password!"));
+                } else {
+                    // GENERATE JWT TOKEN
+                    String jwtToken = new JwtGeneratorImpl().generate(credentials).toString();
+
+                    // CREATE AN HTTP ONLY COOKIE WITH THE JWT TOKEN
+                    HttpCookie cookie = ResponseCookie.from("jwt-token", jwtToken)
+                            .httpOnly(true)
+                            .path("/")
+                            .maxAge(3600) // SET THE COOKIE EXPIRATION TIME AS 1 HOUR
+                            .build();
+
+                    // SEND THE COOKIE ALONG WITH THE RESPONSE
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .header("Set-Cookie", cookie.toString())
+                            .body(Map.of("message", "Login successful!"));
+                }
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", e.getMessage()));
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Please enter xxx@xxx.xx format!"));
+        }
+    }
+
     // LOGIN FUNCTIONALITY
-    @PostMapping ("/login")
+    @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginDTO credentials) {
 
         if (validator.emailValidator(credentials.getUsername())) {
             try {
-                if(Objects.equals(authService.authenticateUser(credentials.getUsername(), credentials.getPassword()), "false")) {
+                if (Objects.equals(authService.authenticateUser(credentials.getUsername(), credentials.getPassword()), "false")) {
 //                    return Map.of("error", "Invalid username or password!");
                     return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(Map.of("error", "Invalid username or password!"));
 //                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid username or password!");
@@ -78,7 +114,7 @@ public class AuthController {
         }
 
         // CHECK IF THERE IS AN EMAIL ALREADY REGISTERED
-        if(authService.findByUsername(signupReq.getEmail()) != null) {
+        if (authService.findByUsername(signupReq.getEmail()) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email address already exists!");
         }
 
@@ -126,11 +162,11 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password must be at least 8 characters!");
         }
 
-        if(validationDTO.getOtp().isEmpty()) {
+        if (validationDTO.getOtp().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please enter the OTP!");
         }
 
-        if(!otpService.compareOtp(validationDTO.getEmail(), validationDTO.getOtp())) {
+        if (!otpService.compareOtp(validationDTO.getEmail(), validationDTO.getOtp())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid OTP!");
         }
 
@@ -146,12 +182,13 @@ public class AuthController {
         }
     }
 
-    // FORGOT PASSWORD EMAIL VALIDATION + OTP SEND REQUEST
+    // TODO: TRY TO USE THE GET MAPPING FOR OTP CODE REQUEST
+    // FORGOT PASSWORD EMAIL VALIDATION + OTP SEND REQUEST (#250)
     @PostMapping("/forgot-password/verify-email")
     public ResponseEntity<String> verifyEmail(@RequestBody EmailDTO userEmail) {
-        if(userEmail != null) {
+        if (userEmail != null) {
             boolean userExist = (!Objects.equals(authService.findByUsername(userEmail.getEmail()), null));
-            if(userExist) { // CHECK WHETHER THE USERNAME IS EXIST IN THE USERS TABLE
+            if (userExist) { // CHECK WHETHER THE USERNAME IS EXIST IN THE USERS TABLE
                 try {
                     emailService.sendEmail(userEmail.getEmail());
                     return ResponseEntity.status(HttpStatus.ACCEPTED).body("Verification code sent!");
@@ -169,38 +206,39 @@ public class AuthController {
     }
 
     // TODO: TRY TO USE THE PARAMETERS INSTEAD OF BODY (USE GET MAPPING)
-    // ENTER EMAIL TO GET THE VERIFICATION CODE FOR CHANGE PASSWORD
+    // ENTER EMAIL TO GET THE VERIFICATION CODE FOR CHANGE PASSWORD (#001)
     @PostMapping("/forgot-password/resend-one-time-passcode")
     public void resendCode(@NonNull @RequestBody EmailDTO userEmail) {
-            boolean userExist = (!Objects.equals(authService.findByUsername(userEmail.getEmail()), null));
-            if(userExist) {
-                try {
-                    emailService.sendEmail(userEmail.getEmail());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Email sending failed!");
-                }
+        boolean userExist = (!Objects.equals(authService.findByUsername(userEmail.getEmail()), null));
+        if (userExist) {
+            try {
+                emailService.sendEmail(userEmail.getEmail());
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("Email sending failed!");
             }
+        }
     }
+
 
     // FORGOT PASSWORD USER VALIDATION + OTP REMOVAL
     @PostMapping("/forgot-password/verify-user")
     public Map<String, String> verifyUser(@RequestBody OtpDTO userOtp) {
-        if(userOtp.getOtp() != null) {
-            if(otpService.compareOtp(userOtp.getEmail(), userOtp.getOtp())) {
+        if (userOtp.getOtp() != null) {
+            if (otpService.compareOtp(userOtp.getEmail(), userOtp.getOtp())) {
                 return Map.of("success", "OTP verified successfully!");
             } else {
                 return Map.of("error", "Invalid OTP!");
             }
         } else {
-            return Map.of("error","OTP cannot be empty!");
+            return Map.of("error", "OTP cannot be empty!");
         }
     }
 
     // CHANGE PASSWORD FUNCTIONALITY + ADDING NEW PASSWORD TO THE DATABASE
     @PutMapping("/forgot-password/change-password") // TO CHANGE THE PASSWORD OF THE USER
     public Map<String, String> changePassword(@RequestBody ForgetPasswordDTO newPasswords) {
-        if(Objects.equals(newPasswords.getPassword(), newPasswords.getConfPassword())) {
+        if (Objects.equals(newPasswords.getPassword(), newPasswords.getConfPassword())) {
             try {
                 authService.changePassword(newPasswords.getEmail(), newPasswords.getPassword());
                 return Map.of("success", "Password reset process successful!");
@@ -231,16 +269,16 @@ public class AuthController {
             ProfileUpdateDTO currentUser = authService.getUserDetails(userName);
             return ResponseEntity.status(HttpStatus.OK).body(currentUser.toString());
         } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User data not found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User data not found!");
         }
     }
 
     // ACCOUNT PASSWORD CHANGE FROM INSIDE
     @PatchMapping("/account/change-password")
     public ResponseEntity<String> updatePassword(@RequestBody PasswordChangeDTO updatedPasswords) {
-        if(Objects.equals(updatedPasswords.getNewPassword(), updatedPasswords.getConfPassword())) {
+        if (Objects.equals(updatedPasswords.getNewPassword(), updatedPasswords.getConfPassword())) {
             try {
-                if(authService.updatePassword(updatedPasswords)) {
+                if (authService.updatePassword(updatedPasswords)) {
                     return ResponseEntity.status(HttpStatus.CREATED).body("Password updated!");
                 } else {
                     return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid current password!");
@@ -250,6 +288,56 @@ public class AuthController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Password does not match!");
+        }
+    }
+
+
+
+
+
+
+
+
+
+    // TODO: USED THE PARAMETERS TO SEND THE EMAIL WITH GET REQUEST (PLEASE REMOVE #001 OR #002)
+    // ENTER EMAIL TO GET THE VERIFICATION CODE FOR CHANGE PASSWORD
+    @GetMapping("/forgot-password/resend-one-time-passcode")
+    public ResponseEntity<String> resendCode(@RequestParam(name = "email") String userEmail) {
+        boolean userExist = (!Objects.equals(authService.findByUsername(userEmail), null));
+        if (userExist) {
+            try {
+                emailService.sendEmail(userEmail);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body("Verification code sent!");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Verification code sending failed!");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
+        }
+    }
+
+
+    // TODO: THIS IS CREATED USING GET REQUEST PLEASE REMOVE #250 OR #251)
+    // FORGOT PASSWORD EMAIL VALIDATION + OTP SEND REQUEST
+    @GetMapping("/forgot-password/verify-email")
+    public ResponseEntity<String> verifyEmail(@RequestParam(name = "email") String userEmail) {
+        if (userEmail != null) {
+            boolean userExist = (!Objects.equals(authService.findByUsername(userEmail), null));
+            if (userExist) { // CHECK WHETHER THE USERNAME IS EXIST IN THE USERS TABLE
+                try {
+                    emailService.sendEmail(userEmail);
+                    return ResponseEntity.status(HttpStatus.ACCEPTED).body("Verification code sent!");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Verification code sending failed!");
+
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username cannot be null!");
         }
     }
 

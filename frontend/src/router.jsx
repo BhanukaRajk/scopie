@@ -31,7 +31,7 @@ const routes = [
 		element: <NewPassword />,
 	},
 	{
-		path: "/",
+		path: "",
 		element: <InsideMainLayout />,
 		children: [
 			{

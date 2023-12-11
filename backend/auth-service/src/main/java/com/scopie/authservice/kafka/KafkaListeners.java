@@ -2,7 +2,9 @@ package com.scopie.authservice.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.scopie.authservice.kafka.dto.KafkaCinemaDTO;
 import com.scopie.authservice.kafka.dto.KafkaMovieDTO;
+import com.scopie.authservice.service.KafkaService;
 import com.scopie.authservice.service.MovieService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +17,28 @@ import java.util.List;
 public class KafkaListeners {
 
     @Autowired
+    private KafkaService kafkaService;
+
+    @Autowired
     private MovieService movieService;
 
     private final ObjectMapper objMapper = new ObjectMapper();
 
+    // GET THE KAFKA MESSAGE WHEN CINEMA SIDE MAKE CHANGES ON ITS DETAILS
     @KafkaListener( topics = "CinemaUpdate")
-    public void cinemaUpdater(String payload) {}
+    public void cinemaUpdater(String payload) {
+        System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            KafkaCinemaDTO kfkCinemaDTO = objectMapper.readValue(payload, KafkaCinemaDTO.class);
 
-    @KafkaListener( topics = "MovieUpdate")
-    public void movieUpdater(String payload) {}
+            // UPDATE THE CINEMA DATA
+            kafkaService.updateCinema(kfkCinemaDTO);
+            System.out.println("Deserialized CinemaDTO: " + kfkCinemaDTO); // TODO: REMOVE THIS
+        } catch (Exception e) {
+            System.out.println("Error deserializing CinemaDTO: " + e.getMessage()); // TODO: REMOVE THIS
+        }
+    }
 
 
 
@@ -49,16 +64,16 @@ public class KafkaListeners {
     // LISTENER TO LISTEN WHEN ANY MOVIE IS ADDED OR UPDATED
     @KafkaListener( topics = "MyReservations", groupId = "groupId" )
     public void movieUpdate(String payload) {
-        System.out.println("Received raw payload: " + payload);
+        System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             KafkaMovieDTO movieDto = objectMapper.readValue(payload, KafkaMovieDTO.class);
 
             // UPDATE THE MOVIE DATA
             movieService.updateMovieList(movieDto);
-            System.out.println("Deserialized MovieDto: " + movieDto);
+            System.out.println("Deserialized MovieDto: " + movieDto); // TODO: REMOVE THIS
         } catch (Exception e) {
-            System.out.println("Error deserializing MovieDto: " + e.getMessage());
+            System.out.println("Error deserializing MovieDto: " + e.getMessage()); // TODO: REMOVE THIS
         }
     }
 
@@ -78,16 +93,16 @@ public class KafkaListeners {
 
     @KafkaListener(topics = "MovieAdd", groupId = "groupId")
     public void updateMovie(String payload) {
-        System.out.println("Received raw payload: " + payload);
+        System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             KafkaMovieDTO movieDto = objectMapper.readValue(payload, KafkaMovieDTO.class);
 
             // UPDATE THE MOVIE DATA
             movieService.updateMovieList(movieDto);
-            System.out.println("Deserialized MovieDto: " + movieDto);
+            System.out.println("Deserialized MovieDto: " + movieDto); // TODO: REMOVE THIS
         } catch (Exception e) {
-            System.out.println("Error deserializing MovieDto: " + e.getMessage());
+            System.out.println("Error deserializing MovieDto: " + e.getMessage()); // TODO: REMOVE THIS
         }
     }
 

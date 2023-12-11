@@ -1,10 +1,12 @@
 // eslint-disable-next-line no-unused-vars
 import React from "react";
-import { NavLink } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { useNavigate, NavLink } from "react-router-dom";
 import { Drawer } from "antd";
 import { FaBars } from "react-icons/fa";
 
 import useDrawer from "../../hooks/useDrawer";
+// import useUser from "../../hooks/useUser";
 
 const drawerContent = [
 	{
@@ -23,14 +25,22 @@ const drawerContent = [
 		label: "Profile",
 		to: "/profile",
 	},
-	{
-		label: "Log out",
-		to: "/logout",
-	},
+	// {
+	// 	label: "Log out",
+	// 	to: "/login",
+	// },
 ];
 
 const SideNavBar = () => {
 	const { isOpen, closeDrawer } = useDrawer();
+	// const navigate = useNavigate();
+	// const { setUserContext } = useUser();
+
+	// const handleLogout = () => {
+	// 	sessionStorage.removeItem("token");
+	// 	setUserContext(null);
+	// 	navigate("/login");
+	// };
 
 	return (
 		<Drawer
@@ -40,6 +50,7 @@ const SideNavBar = () => {
 			onClose={closeDrawer}
 			open={isOpen}
 			getContainer={false}
+			width={310}
 		>
 			<div className="flex flex-col gap-4">
 				{drawerContent.map((item, index) => (
@@ -48,8 +59,8 @@ const SideNavBar = () => {
 						to={item.to}
 						className={({ isActive }) =>
 							`px-4 py-2 rounded-md text-base ${isActive
-								? "bg-blue-950 text-white"
-								: "hover:bg-gray-300 text-black hover:text-black"
+								? " bg-yellow-300 text-black"
+								: " hover:bg-yellow-100 text-black hover:text-black transition-color"
 							}`
 						}
 					>

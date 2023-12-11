@@ -24,7 +24,7 @@ const InsideMainLayout = () => {
     } else {
         return (
             <>
-                <div className="flex flex-col w-screen">
+                <div className="flex flex-col absolute top-0 bottom-0 right-0 left-0">
                     <TopNavBar />
                     <Outlet />
                     <SideNavBar />

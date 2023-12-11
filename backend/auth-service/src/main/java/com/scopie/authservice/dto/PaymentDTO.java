@@ -8,5 +8,5 @@ import lombok.*;
 @NoArgsConstructor
 public class PaymentDTO {
     public String userName;
-    public boolean paymentStatus;
+    public Long reservationId;
 }

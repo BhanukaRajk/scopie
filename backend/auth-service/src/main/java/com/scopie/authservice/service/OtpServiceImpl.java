@@ -73,7 +73,7 @@ public class OtpServiceImpl implements OtpService {
     // COMPARE GENERATED OTP AND USER INPUT OTP
     public boolean compareOtp(String email, String enteredOTP) {
         UserOtp cacheOtp = userOtpRepository.findOtpByEmail(email);
-        return enteredOTP.equals(cacheOtp.getOtp()) && cacheOtp.getDuration().toMinutes() < 5;
+        return enteredOTP.equals(cacheOtp.getOtp()) && cacheOtp.isValid();
     }
 
     // STRING OTP GENERATOR

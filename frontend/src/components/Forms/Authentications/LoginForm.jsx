@@ -9,8 +9,6 @@ import { login } from "../../../apis/authAPI";
 
 const LoginForm = () => {
 
-
-
     const navigate = useNavigate();
     const { user, setUserContext } = useUser();
 
@@ -45,7 +43,7 @@ const LoginForm = () => {
                 type: 'error',
                 content: 'Password cannot be empty!',
             });
-            // } else if (!email_regex.test(credentials.password)) {
+            // } else if (!email_regex.test(credentials.password)) {    // CHECK THE EMAIL PATTERN FOR VALIDATION
             //     console.log(email_regex.test(credentials.password))
             //     console.log(email_regex)
             //     messageApi.open({
@@ -56,6 +54,8 @@ const LoginForm = () => {
             try {
                 const response = await login(credentials);
                 console.log(response);
+                console.log(response.data);
+                console.log(response.data.error);
                 if (response.data.error != null) {
                     
                     messageApi.open({
@@ -64,7 +64,6 @@ const LoginForm = () => {
                     })
                     
                 } else {
-
                     sessionStorage.setItem("token", response.data.token);
                     setUserContext(credentials.username);
 
@@ -89,7 +88,7 @@ const LoginForm = () => {
         <>
             {contextHolder}
 
-            <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-md">
+            <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-lg">
                 <h1 className="text-black font-serif">Scopie</h1>
                 <form onSubmit={handleLoginCredentials} className="mt-8 w-64 flex flex-col">
                     <div className="mb-4">
@@ -99,7 +98,7 @@ const LoginForm = () => {
                             name="username"
                             onChange={handleInputChange}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                            placeholder="Username"
+                            placeholder="Username*"
                         />
                     </div>
                     <div className="mb-4">
@@ -109,7 +108,7 @@ const LoginForm = () => {
                             name="password"
                             onChange={handleInputChange}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                            placeholder="Password"
+                            placeholder="Password*"
                         />
                     </div>
                     <button type="submit" className=" text-md text-center bg-blue-700 hover:bg-blue-400 text-white hover:text-white py-2 rounded-lg font-semibold cursor-pointer">
@@ -118,7 +117,7 @@ const LoginForm = () => {
                 </form>
                 <NavLink to="/forgot-password/verify-username" className="text-sm text-blue-900 mt-4 cursor-pointer">Forgot password?</NavLink>
             </div>
-            <div className="bg-white border border-gray-300 text-center w-80 py-4 rounded-md">
+            <div className="bg-white border border-gray-300 text-center w-80 py-4 rounded-lg">
                 <span className="text-sm text-black">Don&apos;t have an account? </span>
                 <NavLink to="/sign-up" className="text-blue-900 text-sm font-semibold cursor-pointer">Sign up</NavLink>
             </div>

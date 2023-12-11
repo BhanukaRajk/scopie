@@ -36,4 +36,3 @@ public class KafkaProducer {
         return new KafkaTemplate<>(producerFactory);
     }
 }
-

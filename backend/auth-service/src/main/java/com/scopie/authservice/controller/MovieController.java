@@ -1,5 +1,6 @@
 package com.scopie.authservice.controller;
 
+import com.scopie.authservice.dto.MovieDTO;
 import com.scopie.authservice.entity.Movie;
 import com.scopie.authservice.kafka.KafkaProducer;
 import com.scopie.authservice.service.MovieService;
@@ -30,9 +31,11 @@ public class MovieController {
 
     // GET AND SEND ALL MOVIES TO THE MOVIES PAGE WITH FILTERS
     @GetMapping(value = "/")
-    public List<Movie> getMovies(@Nullable @RequestParam String filter) {
+    public List<MovieDTO> getMovies(@Nullable @RequestParam String filter) {
         if(filter != null) {
-            return movieService.getMovies(filter);
+//            return movieService.getMovies(filter);
+            return movieService.getMovies();
+
         } else {
             return movieService.getMovies();
         }

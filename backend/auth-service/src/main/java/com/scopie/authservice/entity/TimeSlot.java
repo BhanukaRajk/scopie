@@ -1,9 +1,6 @@
 package com.scopie.authservice.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.List;
 
 @Builder
 @Data
@@ -19,6 +17,12 @@ import java.sql.Time;
 @Entity
 @Table(name = "t_timeslot")
 public class TimeSlot {
+
+    public enum Day {
+        Weekday,
+        Sunday,
+        Satuarday
+    }
 
     @Id
     @Column(name = "slot_id")
@@ -30,9 +34,10 @@ public class TimeSlot {
     @Column(name = "endTime")
     private Time endTime;
 
-    private enum date{
-        Weekday,
-        Saturday,
-        Sunday
-    }
+    @Enumerated(EnumType.STRING)
+    public Day day;
+
+    @OneToMany(mappedBy = "slotId", fetch = FetchType.LAZY)
+    private List<MovieTime> movieTimes;
+
 }

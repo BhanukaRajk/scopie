@@ -1,8 +1,10 @@
 package com.scopie.authservice.service;
 
+import com.scopie.authservice.dto.MovieDTO;
 import com.scopie.authservice.kafka.dto.KafkaMovieDTO;
 import com.scopie.authservice.entity.Movie;
 import com.scopie.authservice.repository.MovieRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,14 +12,21 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.List;
 
 @Service
-public class MovieServiceImpl implements MovieService{
+public class MovieServiceImpl implements MovieService {
 
     @Autowired
     private MovieRepository movieRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Value("${upload.path}")
     private String FILE_PATH;
@@ -28,8 +37,17 @@ public class MovieServiceImpl implements MovieService{
     }
 
     // GET MOVIES WHEN FILTER KEY IS NOT AVAILABLE
-    public List<Movie> getMovies() {
-        return movieRepository.findAll();
+    public List<MovieDTO> getMovies() {
+        List<Movie> movies = movieRepository.findAll();
+        return movies.stream()
+                .map(movie -> new MovieDTO(
+                        movie.getMovieId(),
+                        movie.getTitle(),
+                        movie.getBanner(),
+                        movie.getGenre(),
+                        movie.getLanguage(),
+                        movie.getDuration()
+                )).toList();
     }
 
     // GET THE MOVIE DETAILS WHEN USER CLICK ON SOME MOVIE
@@ -37,27 +55,36 @@ public class MovieServiceImpl implements MovieService{
         return movieRepository.getMovieByMovieId(movieId);
     }
 
-    // ADD OR UPDATE MOVIES
+    // ADD OR UPDATE MOVIES WHEN KAFKA MESSAGE RECEIVED
     public void updateMovieList(KafkaMovieDTO movieReq) throws IOException {
 
-        MultipartFile image = movieReq.getBanner();    // GET IMAGE FROM DATASET
+        try {
+            MultipartFile image = movieReq.getBanner();    // GET THE FILE FROM DTO
 
-        String imageName = UUID.randomUUID().toString()+image.getContentType();     // SET A NAME FOR THE FILE
-        String imagePath = FILE_PATH+imageName;
+            // GET THE ORIGINAL FILE NAME
+            String originalImageName = image.getOriginalFilename();
+            assert originalImageName != null;
 
-        // TODO: NEED TO CHANGE THE FILE NAME BEFORE STORE IT ON UPLOADS FOLDER
+            // GENERATE UNIQUE FILE NAME USING UUID
+            String fileExtension = originalImageName.substring(originalImageName.lastIndexOf("."));
+            String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
 
-        movieRepository.save(Movie.builder()
-                .movieId(movieReq.getMovieId())
-                .title(movieReq.getTitle())
-                .banner(imagePath)
-                .duration(movieReq.getDuration())
-                .genre(movieReq.getGenre())
-                .language(movieReq.getLanguage())
-                .build()
-        );
+            // SAVE THE FILE IN UPLOADS FOLDER
+            String filePath = Paths.get(FILE_PATH, uniqueFilename).toString();
+            Files.copy(image.getInputStream(), Paths.get(FILE_PATH).resolve(uniqueFilename));
 
-        // TRANSFER THE FILE TO THE UPLOADS FOLDER
-        image.transferTo(new File(FILE_PATH));
+            // SAVE OR UPDATE THE RECORD
+            movieRepository.save(Movie.builder()
+                    .movieId(movieReq.getMovieId())
+                    .title(movieReq.getTitle())
+                    .banner(filePath)
+                    .duration(movieReq.getDuration())
+                    .genre(movieReq.getGenre())
+                    .language(movieReq.getLanguage())
+                    .build()
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
