@@ -19,7 +19,7 @@ public class Movie {
 
     @Id
     @Column(name = "movie_id")
-    private Long movieId;
+    private long movieId;
 
     @Column(name = "banner")
     private String banner;

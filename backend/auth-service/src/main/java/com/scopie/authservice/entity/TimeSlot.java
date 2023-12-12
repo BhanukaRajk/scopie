@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class TimeSlot {
 
     @Id
     @Column(name = "slot_id")
-    private Long slotId;
+    private long slotId;
 
     @Column(name = "startTime", nullable = false)
     private Time startTime;

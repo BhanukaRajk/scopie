@@ -27,7 +27,7 @@ public class MovieController {
     private MovieService movieService;
 
     @Autowired
-    KafkaTemplate<String, String> kafkaTemplate;
+    KafkaTemplate<String, Integer> kafkaTemplate;
 
     // GET AND SEND ALL MOVIES TO THE MOVIES PAGE WITH FILTERS
     @GetMapping(value = "/")
@@ -43,7 +43,7 @@ public class MovieController {
 
     // SEND THE SPECIFIC MOVIE DETAILS WHEN CUSTOMER CLICKS ON SOME MOVIE
     @GetMapping(value = "/:id")
-    public ResponseEntity<String> expandSpecificMovie(@RequestParam Long movieId) {
+    public ResponseEntity<String> expandSpecificMovie(@RequestParam long movieId) {
         return ResponseEntity.status(HttpStatus.OK).body(movieService.movieDetails(movieId).toString());
     }
 
@@ -58,13 +58,13 @@ public class MovieController {
     // TODO: REMOVE THIS FUNCTION
     @GetMapping(value = "/test")
     public String testMovies() {
-        kafkaTemplate.send("movie_details", "I'm working from test function");
+        kafkaTemplate.send("movie_details", 2);
         return "Test function working!";
     }
 
     @GetMapping(value = "/test2")
     public String test2Movies() {
-        kafkaTemplate.send("movie_details", "I'm working from test 2 function");
+        kafkaTemplate.send("movie_details", 2);
         return "Test 2 function working!";
     }
 

@@ -1,14 +1,14 @@
 package com.scopie.authservice.kafka.dto;
 
 import lombok.*;
-import java.sql.Date;
+import java.util.Date;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class KafkaReservationDTO {
-    private Long reservationId;
+    private long reservationId;
     private Date date;
     private Double totalPrice;
 }

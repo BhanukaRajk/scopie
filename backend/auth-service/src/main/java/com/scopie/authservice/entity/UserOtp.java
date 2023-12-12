@@ -22,7 +22,7 @@ public class UserOtp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "otp_id", nullable = false)
-    private Long otpId;
+    private long otpId;
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -35,7 +35,8 @@ public class UserOtp {
     @CreationTimestamp
     private Timestamp createdAt;
 
-    @Column(name = "expiration_time", nullable = false)
+//    @Column(name = "expiration_time", nullable = false)
+    @Column(name = "expiration_time")
     private Timestamp expirationTime;
 
     @Column(name = "status", nullable = false)
@@ -43,9 +44,10 @@ public class UserOtp {
     private OtpStatus status;
 
 
-    @PrePersist
+//    @PrePersist
     private void setExpirationTime() {
-        this.expirationTime = new Timestamp(createdAt.getTime() + (5 * 60 * 1000));
+//        this.expirationTime = new Timestamp(createdAt.getTime() + (5 * 60 * 1000));
+        this.expirationTime = new Timestamp(System.currentTimeMillis() + (5 * 60 * 1000));
     }   // SET THE EXPIRATION TIME AFTER 5 MINUTES FROM THE CREATION TIME
 
     public boolean isExpired() {
@@ -63,7 +65,12 @@ public class UserOtp {
     public boolean isValid() {
         if(this.status == OtpStatus.VALID) {
             this.updateStatus();
-            return this.status == OtpStatus.VALID;
+            if (this.status == OtpStatus.VALID) {
+                this.status = OtpStatus.INVALID; // SET THE OTP AS INVALID AFTER USE
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
@@ -76,5 +83,7 @@ public class UserOtp {
     public void setEmailAndOtp(String email, String otp) {
         this.email = email;
         this.otp = otp;
+        this.status = OtpStatus.VALID;
+        setExpirationTime();
     }
 }

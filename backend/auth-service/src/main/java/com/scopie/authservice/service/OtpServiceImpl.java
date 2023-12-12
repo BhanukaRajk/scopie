@@ -2,19 +2,13 @@ package com.scopie.authservice.service;
 
 import com.scopie.authservice.entity.UserOtp;
 import com.scopie.authservice.repository.UserOtpRepository;
-import org.hibernate.annotations.CurrentTimestamp;
-import org.hibernate.generator.internal.CurrentTimestampGeneration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
+
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Random;
 
 @Component

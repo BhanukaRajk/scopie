@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 @Builder
@@ -21,7 +21,7 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reservation_id")
-    private Long reservationId;
+    private long reservationId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "customer_id", name = "customer", nullable = false)
@@ -33,6 +33,7 @@ public class Reservation {
     @Column(name = "created_date", nullable = false)
     @CreationTimestamp
     private Date date;
+
 
     @OneToMany(mappedBy = "reservationId", fetch = FetchType.LAZY)
     private List<ReservedSeat> reservedSeats;

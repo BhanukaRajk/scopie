@@ -25,22 +25,10 @@ const drawerContent = [
 		label: "Profile",
 		to: "/profile",
 	},
-	// {
-	// 	label: "Log out",
-	// 	to: "/login",
-	// },
 ];
 
 const SideNavBar = () => {
 	const { isOpen, closeDrawer } = useDrawer();
-	// const navigate = useNavigate();
-	// const { setUserContext } = useUser();
-
-	// const handleLogout = () => {
-	// 	sessionStorage.removeItem("token");
-	// 	setUserContext(null);
-	// 	navigate("/login");
-	// };
 
 	return (
 		<Drawer
@@ -59,8 +47,8 @@ const SideNavBar = () => {
 						to={item.to}
 						className={({ isActive }) =>
 							`px-4 py-2 rounded-md text-base ${isActive
-								? " bg-yellow-300 text-black"
-								: " hover:bg-yellow-100 text-black hover:text-black transition-color"
+								? " bg-yellow-300 text-black hover:text-black font-semibold"
+								: " hover:bg-yellow-100 text-black hover:text-black transition-color font-semibold"
 							}`
 						}
 					>

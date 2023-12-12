@@ -18,7 +18,7 @@ public class Seat {
 
     @Id
     @Column(name = "seat_id")
-    private Long seatId;
+    private long seatId;
 
     @OneToMany(mappedBy = "seatId", fetch = FetchType.LAZY)
     private List<ReservedSeat> reservedSeats;

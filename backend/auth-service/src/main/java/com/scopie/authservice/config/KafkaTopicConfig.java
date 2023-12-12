@@ -20,6 +20,11 @@ public class KafkaTopicConfig {
     }
 
     @Bean
+    public NewTopic newTestTopic() {
+        return TopicBuilder.name("test_message").build();
+    }
+
+    @Bean
     public NewTopic newReservationRemoveTopic() {
         return TopicBuilder.name("NewReserveCancellation").build();
     }

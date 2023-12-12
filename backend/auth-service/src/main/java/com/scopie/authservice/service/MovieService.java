@@ -11,6 +11,6 @@ import java.util.List;
 public interface MovieService {
     List<Movie> getMovies(String filter);
     List<MovieDTO> getMovies();
-    Movie movieDetails(Long movieId);
+    Movie movieDetails(long movieId);
     void updateMovieList(KafkaMovieDTO movie) throws IOException;
 }

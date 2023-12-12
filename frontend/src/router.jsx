@@ -44,7 +44,7 @@ const routes = [
 			},
 			{
 				path: "/movie-services",
-				element: <><Outlet /></>,
+				element: <Outlet />,
 				children: [
 					{
 						path: "/movie-services/movies",
@@ -54,7 +54,7 @@ const routes = [
 			},
 			{
 				path: "/reservation-services",
-				element: <><Outlet /></>,
+				element: <Outlet />,
 				children: [
 					{
 						path: "/reservation-services/my-reservations",

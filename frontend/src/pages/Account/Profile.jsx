@@ -3,9 +3,11 @@ import React, { useState } from "react";
 
 import EditProfileForm from "../../components/Forms/AccountSettings/EditProfileForm";
 import UpdatePasswordForm from "../../components/Forms/AccountSettings/UpdatePasswordForm";
+import useUser from "../../hooks/useUser";
 
 const Profile = () => {
     const [isNewPasswordForm, toggleNewPasswordFrom] = useState(false);
+    const { user } = useUser();
 
     const onOpen = () => {
         toggleNewPasswordFrom(true);
@@ -17,11 +19,11 @@ const Profile = () => {
 
     return (
         <>
-            <div className="h-screen w-screen bg-gray-50 flex flex-col justify-center items-center">
-                <EditProfileForm onOpen = {onOpen} />
+            <div className="h-screen w-screen bg-gray-50 flex flex-col justify-center items-center login-background">
+                <EditProfileForm onOpen = {onOpen} nuser={user} />
 
                 <div className={`${isNewPasswordForm ? "block" : "hidden"}`}>
-                    <UpdatePasswordForm isOpen={isNewPasswordForm} onClose={onClose} />
+                    <UpdatePasswordForm onClose={onClose} user={user} />
                 </div>
             </div>
         </>

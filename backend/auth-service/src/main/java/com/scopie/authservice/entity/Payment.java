@@ -20,7 +20,7 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
-    private Long paymentId;
+    private long paymentId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "reservation_id", name = "reservation", nullable = false)

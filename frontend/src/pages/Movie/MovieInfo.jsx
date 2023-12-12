@@ -1,15 +1,15 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
 import MovieCard from "../../components/Cards/MovieCard";
-import { getMovies } from "../../apis/movieAPI";
+import { getMovie } from "../../apis/movieAPI";
 
 const Movies = () => {
-    const [movies, setMovies] = useState([]);
+    const [movie, setMovie] = useState([]);
     useEffect(() => {
         const fetchMovies = async () => {
             try {
-                const response = await getMovies();
-                setMovies(response);
+                const response = await getMovie();
+                setMovie(response);
             } catch {
                 console.log("error");
             }
@@ -19,11 +19,8 @@ const Movies = () => {
 
     return (
         <>
-            <div className="flex md:flex-col gap-3">
-                {!movies ? "<div className='text-lg text-center'> No movies to show </div>" :
-                    movies.map((movie) => (
-                        <MovieCard movie={movie} key={movie.id} />
-                    ))}
+            <div className="h-screen w-screen bg-gray-50 flex flex-col justify-center items-center login-background">
+                <div></div>
             </div>
         </>
     )

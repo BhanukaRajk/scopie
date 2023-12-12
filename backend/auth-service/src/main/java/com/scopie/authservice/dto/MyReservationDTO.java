@@ -11,9 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MyReservationDTO {
-    private Long customerId;
+    private long customerId;
     private String movieName;
-    private Long reservationId;
+    private long reservationId;
     private Double totalPrice;
     private Date bookedOn; // DATE WHEN CREATED
     private List<Long> seatNumbers;

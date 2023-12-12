@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.scopie.authservice.kafka.dto.KafkaCinemaDTO;
 import com.scopie.authservice.kafka.dto.KafkaMovieDTO;
+import com.scopie.authservice.kafka.dto.KafkaMovieTimeDTO;
+import com.scopie.authservice.kafka.dto.KafkaReservationDTO;
 import com.scopie.authservice.service.KafkaService;
 import com.scopie.authservice.service.MovieService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -30,7 +33,7 @@ public class KafkaListeners {
         System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            KafkaCinemaDTO kfkCinemaDTO = objectMapper.readValue(payload, KafkaCinemaDTO.class);
+            KafkaMovieTimeDTO kfkMovieTimeDTO = objectMapper.readValue(payload, KafkaMovieTimeDTO.class);
 
             // UPDATE THE CINEMA DATA
             kafkaService.updateCinema(kfkCinemaDTO);
@@ -43,10 +46,14 @@ public class KafkaListeners {
 
 
 
+    // TODO: THIS IS ONLY FOR TESTING PURPOSE
+    @KafkaListener( topics = "test_message", groupId = "groupId" )
+    public void listener(String message) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        System.out.println("Message received: " + objectMapper.readValue(message, KafkaReservationDTO.class));
 
-    @KafkaListener( topics = "test", groupId = "groupId" )
-    public void listener(String message) {
-        System.out.println("Message received: " + message);
+        ModelMapper modelMapper = new ModelMapper();
+        System.out.println("Message received: " + modelMapper.map(message, KafkaReservationDTO.class));
     }
 
     // GET CURRENT WHEN CUSTOMER NEED THE CURRENT SEAT BOOKING DETAILS
@@ -62,45 +69,31 @@ public class KafkaListeners {
     }
 
     // LISTENER TO LISTEN WHEN ANY MOVIE IS ADDED OR UPDATED
-    @KafkaListener( topics = "MyReservations", groupId = "groupId" )
-    public void movieUpdate(String payload) {
+    @KafkaListener( topics = "CinemaAdd", groupId = "groupId" )
+    public void updateCinema(String payload) {
         System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            KafkaMovieDTO movieDto = objectMapper.readValue(payload, KafkaMovieDTO.class);
+            KafkaCinemaDTO kfkCinemaDTO = objectMapper.readValue(payload, KafkaCinemaDTO.class);
 
-            // UPDATE THE MOVIE DATA
-            movieService.updateMovieList(movieDto);
-            System.out.println("Deserialized MovieDto: " + movieDto); // TODO: REMOVE THIS
+            // UPDATE THE CINEMA DATA
+            kafkaService.updateCinema(kfkCinemaDTO);
+            System.out.println("Deserialized Cinema DTO: " + kfkCinemaDTO); // TODO: REMOVE THIS
         } catch (Exception e) {
-            System.out.println("Error deserializing MovieDto: " + e.getMessage()); // TODO: REMOVE THIS
+            System.out.println("Error deserializing Cinema DTO: " + e.getMessage()); // TODO: REMOVE THIS
         }
     }
-
-    // GET MOVIE DATA FROM OTHER END
-//    @KafkaListener(topics = "MovieAdd", groupId = "groupId")
-//    void updateMovie(String payload) {
-//        System.out.println("Received raw payload: " + payload);
-//
-//        try {
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            MovieDTO movieDto = objectMapper.readValue(payload, MovieDTO.class);
-//            System.out.println("Deserialized MovieDto: " + movieDto);
-//        } catch (Exception e) {
-//            System.out.println("Error deserializing MovieDto: " + e.getMessage());
-//        }
-//    }
 
     @KafkaListener(topics = "MovieAdd", groupId = "groupId")
     public void updateMovie(String payload) {
         System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            KafkaMovieDTO movieDto = objectMapper.readValue(payload, KafkaMovieDTO.class);
+            KafkaMovieDTO kfkMovieDTO = objectMapper.readValue(payload, KafkaMovieDTO.class);
 
             // UPDATE THE MOVIE DATA
-            movieService.updateMovieList(movieDto);
-            System.out.println("Deserialized MovieDto: " + movieDto); // TODO: REMOVE THIS
+            movieService.updateMovieList(kfkMovieDTO);
+            System.out.println("Deserialized MovieDto: " + kfkMovieDTO); // TODO: REMOVE THIS
         } catch (Exception e) {
             System.out.println("Error deserializing MovieDto: " + e.getMessage()); // TODO: REMOVE THIS
         }

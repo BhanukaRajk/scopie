@@ -10,10 +10,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReservationDTO {
-    private Integer userName;
-    private Integer movieId;
-    private Integer cinemaId;
-    private Integer timeSlotId;
-    private List<Integer> seatSelection;
+    private String userName;
+    private long movieId;
+    private long cinemaId;
+    private long timeSlotId;
+    private List<Long> seatSelection;
     private Date movieDate;
 }

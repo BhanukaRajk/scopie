@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class KafkaReservedSeatDTO {
-    private Long reservationSeatId; // UNIQUE FOR LIST
-    private Long seatId; // UNIQUE FOR LIST
-    private Long movieTimeId; // SAME IN LISTS
-    private Long reservationId; // SAME IN LISTS
+    private long reservationSeatId; // UNIQUE FOR LIST
+    private long seatId; // UNIQUE FOR LIST
+    private long movieTimeId; // SAME IN LISTS
+    private long reservationId; // SAME IN LISTS
 }

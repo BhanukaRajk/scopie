@@ -51,7 +51,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     // GET THE MOVIE DETAILS WHEN USER CLICK ON SOME MOVIE
-    public Movie movieDetails(Long movieId) {
+    public Movie movieDetails(long movieId) {
         return movieRepository.getMovieByMovieId(movieId);
     }
 

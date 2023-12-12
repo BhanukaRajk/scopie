@@ -28,17 +28,18 @@ public class ReservationController {
 
     // CREATE NEW RESERVATION FOR A CUSTOMER
     @PostMapping("/new")
-    public void addReservation(@RequestBody ReservationDTO reservationDTO) throws NoSuchMethodException {
+    public ResponseEntity<String> addReservation(@RequestBody ReservationDTO reservationDTO) {
         try {
             reservationService.newReservation(reservationDTO);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Reservation Success!");
         } catch (Exception e) {
-            throw new NoSuchMethodException();
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Reservation Failed! Error:" + e);
         }
     }
 
     // GET THE RESERVATION DATA WHEN USER REQUESTED BY SELECTING A RESERVATION
     @GetMapping("/:id")
-    public Optional<Reservation> viewSpecificReservation(@RequestParam Long reservationId) throws NotFoundException {
+    public Optional<Reservation> viewSpecificReservation(@RequestParam long reservationId) throws NotFoundException {
         try {
             return reservationService.getReservationById(reservationId);
         } catch (Exception e) {
@@ -46,17 +47,8 @@ public class ReservationController {
         }
     }
 
-    @PatchMapping("/confirmation")
-    public void reservationStatusHandler(Long reservationId, boolean confirmation) throws CannotProceedException {
-        try {
-            reservationService.reservationAcceptor(reservationId, confirmation);
-        } catch (Exception e) {
-            throw new CannotProceedException();
-        }
-    }
-
     @DeleteMapping("/cancel")
-    public void cancelReservation(@RequestBody Long reservationId) {
+    public void cancelReservation(@RequestBody long reservationId) {
         try {
             reservationService.cancelReservation(reservationId);
         } catch (Exception e) {

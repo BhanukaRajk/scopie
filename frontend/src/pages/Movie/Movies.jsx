@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { Empty } from "antd";
 import MovieCard from "../../components/Cards/MovieCard";
 import { getMovies } from "../../apis/movieAPI";
-import AddReservationForm from "../../components/Forms/Reservations/AddReservationForm";
 
 const Movies = () => {
     const [movies, setMovies] = useState([]);
@@ -17,14 +16,14 @@ const Movies = () => {
             }
         }
         fetchMovies();
-    }), [];
+    }, []);
 
     return (
         <>
             <div className="flex flex-col mx-3 my-2">
                 <div className="my-3 text-lg text-black w-full text-center font-sans font-semibold">Movies</div>
                 <div className="border border-gray-300 w-full my-4"></div>
-                <div className="flex flex-col gap-3 w-full">
+                <div className="flex flex-col md:flex-row flex-wrap gap-4 w-full">
                 {movies.length === 0 ?
                     <Empty
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -36,7 +35,6 @@ const Movies = () => {
                     ))}
                 </div>
             </div>
-            <AddReservationForm />
         </>
     )
 }

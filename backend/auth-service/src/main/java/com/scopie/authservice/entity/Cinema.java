@@ -18,7 +18,7 @@ public class Cinema {
 
     @Id
     @Column(name = "cinema_id")
-    private Long id;
+    private long id;
 
     @Column(name = "cinema_name", nullable = false)
     private String name;

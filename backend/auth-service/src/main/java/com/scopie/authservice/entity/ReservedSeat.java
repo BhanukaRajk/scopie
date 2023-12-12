@@ -16,7 +16,7 @@ public class ReservedSeat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reserved_seat_id")
-    private Long reservedSeatId;
+    private long reservedSeatId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "movie_time_id", name = "movie_time_id", nullable = false)

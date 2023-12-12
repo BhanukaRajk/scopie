@@ -19,7 +19,7 @@ public class MovieTime {
 
     @Id
     @Column(name = "movie_time_id", nullable = false)
-    private Long movieTimeId;
+    private long movieTimeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "movie_id", name = "movie_id", nullable = false)

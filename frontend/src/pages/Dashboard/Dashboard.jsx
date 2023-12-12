@@ -34,21 +34,21 @@ const Dashboard = () => {
             try {
                 const response = await getMovies();
                 console.log(response.data);
-                // setNewReleases(response.data);
+                setNewReleases(response.data);
             } catch {
                 console.error("e");
             }
         }
         fetchRecents();
 
-    }), [];
+    }, []);
 
     return (
         <>
             <div className="flex flex-col gap-3 mx-3">
                 <div className="mt-4 w-full text-2xl text-black font-semibold text-center lg:text-start">Upcoming reservations</div>
                 <div className="w-full border border-gray-300 my-2"></div>
-                <div className="flex flex-col sm:flex-row sm:justify-start sm:flex-wrap gap-5 w-full min-w-fit">
+                <div className="flex flex-col sm:flex-row justify-start sm:flex-wrap gap-5 w-full min-w-fit">
                     {movies.length == 0 ? <Empty description="You don't have any reservations" /> :
                         movies.map((latest) => (
                             <NewReleasesCard movie={latest} key={latest.id} />

@@ -6,13 +6,9 @@ import com.scopie.authservice.dto.ValidationDTO;
 import com.scopie.authservice.entity.Customer;
 import com.scopie.authservice.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.management.RuntimeErrorException;
-import java.util.Objects;
 
 
 @Service
@@ -48,15 +44,23 @@ public class AuthServiceImpl implements AuthService {
 
     // ADDING NEW CUSTOMER
     public void signUp(ValidationDTO validationDTO) {
-        Customer newCustomer = new Customer(
-                null,
-                validationDTO.getFirstName(),
-                validationDTO.getLastName(),
-                validationDTO.getEmail(),
-                passwordEncoder.encode(validationDTO.getPassword()),
-                null
+//        Customer newCustomer = new Customer(
+//                null,
+//                validationDTO.getFirstName(),
+//                validationDTO.getLastName(),
+//                validationDTO.getEmail(),
+//                passwordEncoder.encode(validationDTO.getPassword()),
+//                null
+//        );
+//        customerRepo.save(newCustomer);
+
+        customerRepo.save(Customer.builder()
+                .firstName(validationDTO.getFirstName())
+                .lastName(validationDTO.getLastName())
+                .email(validationDTO.getEmail())
+                .password(passwordEncoder.encode(validationDTO.getPassword()))
+                .build()
         );
-        customerRepo.save(newCustomer);
     }
 
     public void changePassword(String username, String new_password) {
