@@ -1,21 +1,27 @@
 package com.scopie.authservice.service;
 
 import com.scopie.authservice.dto.MovieDTO;
+import com.scopie.authservice.dto.MovieShowsDTO;
+import com.scopie.authservice.dto.ShowTimeDTO;
+import com.scopie.authservice.dto.TimeSlotDTO;
+import com.scopie.authservice.entity.Cinema;
+import com.scopie.authservice.entity.MovieTime;
+import com.scopie.authservice.entity.TimeSlot;
 import com.scopie.authservice.kafka.dto.KafkaMovieDTO;
 import com.scopie.authservice.entity.Movie;
 import com.scopie.authservice.repository.MovieRepository;
+import com.scopie.authservice.repository.MovieTimeRepository;
+import com.scopie.authservice.repository.TimeSlotRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.List;
 
@@ -26,10 +32,17 @@ public class MovieServiceImpl implements MovieService {
     private MovieRepository movieRepository;
 
     @Autowired
+    private MovieTimeRepository movieTimeRepository;
+
+    @Autowired
+    private TimeSlotRepository timeSlotRepository;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @Value("${upload.path}")
     private String FILE_PATH;
+
 
     // GET MOVIES WHEN FILTER KEY IS AVAILABLE
     public List<Movie> getMovies(String filter) {
@@ -51,9 +64,119 @@ public class MovieServiceImpl implements MovieService {
     }
 
     // GET THE MOVIE DETAILS WHEN USER CLICK ON SOME MOVIE
-    public Movie movieDetails(long movieId) {
-        return movieRepository.getMovieByMovieId(movieId);
+//    public MovieShowsDTO movieDetails(long movieId) {
+//        List<MovieTime> movieTimes = movieTimeRepository.findAllByMovieId(movieId); // ORDERED BY CINEMA ID
+//
+//        long currentCinema = movieTimes.get(0).getCinemaId().getId();
+//
+//        List<TimeSlotDTO> timeSlotRecordsSet = new ArrayList<>();
+//        List<ShowTimeDTO> showTimesSet = new ArrayList<>();
+//
+//        for (int item = 0; item < movieTimes.size(); item++) {
+//            MovieTime thisItem = movieTimes.get(item);
+//
+//            Cinema cinema = thisItem.getCinemaId();
+//            TimeSlot timeSlot = thisItem.getSlotId();
+//
+//            if ( item == 0 || thisItem.getCinemaId().getId() != currentCinema ) {
+//
+//                timeSlotRecordsSet.clear();
+//
+//                long thisItemTimeSlotId = thisItem.getSlotId().getSlotId();
+//                TimeSlotDTO timeSlotRecord = TimeSlotDTO.builder()
+//                        .slotId(thisItemTimeSlotId)
+//                        .startTime(timeSlotRepository.findTimeById(thisItemTimeSlotId))
+//                        .build();
+//                timeSlotRecordsSet.add(timeSlotRecord);
+//
+//                ShowTimeDTO showTime = ShowTimeDTO.builder()
+//                        .id(currentCinema)
+//                        .name(cinema.getName())
+//                        .timeSlots(timeSlotRecordsSet)
+//                        .build();
+//
+//                currentCinema = thisItem.getCinemaId().getId();
+//
+//            } else {
+//
+//                long thisItemTimeSlotId = thisItem.getSlotId().getSlotId();
+//                TimeSlotDTO timeSlotRecord = TimeSlotDTO.builder()
+//                        .slotId(thisItemTimeSlotId)
+//                        .startTime(timeSlotRepository.findTimeById(thisItemTimeSlotId))
+//                        .build();
+//                timeSlotRecordsSet.add(timeSlotRecord);
+//            }
+//
+//        }
+//
+//        MovieShowsDTO movieShows = MovieShowsDTO.builder()
+//                .movieId(movieId)
+//                .title(movieRepository.getMovieByMovieId(movieId).getTitle())
+//                .movieShows()
+//                .build();
+//
+//        return movieShows;
+////        return movieRepository.getMovieByMovieId(movieId);
+//    }
+
+    // SEND THE DATA WHEN USER SELECTS MOVIE TO RESERVATION
+    public MovieShowsDTO movieDetails(long movieId) {
+        List<MovieTime> movieTimes = movieTimeRepository.findAllByMovieId(movieId);
+
+        long currentCinema = -1; // START FROM THE BEGINNING
+
+        // CREATING TWO LISTS FOR CINEMA TIMESLOTS AND MOVIE CINEMAS
+        List<TimeSlotDTO> timeSlotRecordsSet = new ArrayList<>();
+        List<ShowTimeDTO> showTimesSet = new ArrayList<>();
+
+        for (int item = 0; item < movieTimes.size(); item++) {
+            MovieTime thisItem = movieTimes.get(item);
+
+            Cinema cinema = thisItem.getCinemaId();
+            TimeSlot timeSlot = thisItem.getSlotId();
+
+            if (currentCinema == -1 || thisItem.getCinemaId().getId() != currentCinema) {
+                // CREATING NEW ShowTimeDTO FOR A CINEMA SHOW TIME
+                if (!timeSlotRecordsSet.isEmpty()) {
+                    ShowTimeDTO showTime = ShowTimeDTO.builder()
+                            .id(currentCinema)
+                            .name(cinema.getName())
+                            .timeSlots(new ArrayList<>(timeSlotRecordsSet)) // Copy the list
+                            .build();
+                    showTimesSet.add(showTime);
+                }
+
+                // CLEAR THE timeSlotRecordsSet FOR THE NEW CINEMA
+                timeSlotRecordsSet.clear();
+                currentCinema = thisItem.getCinemaId().getId();
+            }
+
+            long thisItemTimeSlotId = timeSlot.getSlotId();
+            TimeSlotDTO timeSlotRecord = TimeSlotDTO.builder()
+                    .slotId(thisItemTimeSlotId)
+                    .startTime(timeSlotRepository.findTimeById(thisItemTimeSlotId))
+                    .build();
+            timeSlotRecordsSet.add(timeSlotRecord);
+
+            // HANDLE THE LAST CINEMA
+            if (item == movieTimes.size() - 1) {
+                ShowTimeDTO showTime = ShowTimeDTO.builder()
+                        .id(currentCinema)
+                        .name(cinema.getName())
+                        .timeSlots(new ArrayList<>(timeSlotRecordsSet)) // COPY THE LIST
+                        .build();
+                showTimesSet.add(showTime);
+            }
+        }
+
+        // CREATE AND RETURN FINAL OBJECT
+        return MovieShowsDTO.builder()
+                .movieId(movieId)
+                .title(movieRepository.getMovieByMovieId(movieId).getTitle())
+                .movieShows(showTimesSet)
+                .build();
     }
+
 
     // ADD OR UPDATE MOVIES WHEN KAFKA MESSAGE RECEIVED
     public void updateMovieList(KafkaMovieDTO movieReq) throws IOException {

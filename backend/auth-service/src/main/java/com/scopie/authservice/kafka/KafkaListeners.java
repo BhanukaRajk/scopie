@@ -28,24 +28,6 @@ public class KafkaListeners {
     private final ObjectMapper objMapper = new ObjectMapper();
 
     // GET THE KAFKA MESSAGE WHEN CINEMA SIDE MAKE CHANGES ON ITS DETAILS
-    @KafkaListener( topics = "CinemaUpdate")
-    public void cinemaUpdater(String payload) {
-        System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            KafkaMovieTimeDTO kfkMovieTimeDTO = objectMapper.readValue(payload, KafkaMovieTimeDTO.class);
-
-            // UPDATE THE CINEMA DATA
-            kafkaService.updateCinema(kfkCinemaDTO);
-            System.out.println("Deserialized CinemaDTO: " + kfkCinemaDTO); // TODO: REMOVE THIS
-        } catch (Exception e) {
-            System.out.println("Error deserializing CinemaDTO: " + e.getMessage()); // TODO: REMOVE THIS
-        }
-    }
-
-
-
-
     // TODO: THIS IS ONLY FOR TESTING PURPOSE
     @KafkaListener( topics = "test_message", groupId = "groupId" )
     public void listener(String message) throws JsonProcessingException {
@@ -56,15 +38,34 @@ public class KafkaListeners {
         System.out.println("Message received: " + modelMapper.map(message, KafkaReservationDTO.class));
     }
 
-    // GET CURRENT WHEN CUSTOMER NEED THE CURRENT SEAT BOOKING DETAILS
-    @KafkaListener( topics = "seat_details", groupId = "groupId" )
-    public List<Boolean> seatAvailability(String payload)  {
-        System.out.println("Seat reservation data received!" + payload);
+
+    @KafkaListener( topics = "SeatAdd")
+    public void seatUpdater(String payload) {
+        System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(payload, new TypeReference<List<Boolean>>() {}); // SEND THE SEAT RESERVATION DATA USING BOOLEAN ARRAY
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            Long seatId = objectMapper.readValue(payload, Long.class);
+
+            // UPDATE THE SEAT COUNT
+            kafkaService.addNewSeat(seatId); // TODO: ADD NEW SEATS TO TABLE
+            System.out.println("Deserialized seat number: " + seatId); // TODO: REMOVE THIS
+        } catch (Exception e) {
+            System.out.println("Error deserializing seat number: " + e.getMessage()); // TODO: REMOVE THIS
+        }
+    }
+
+    @KafkaListener( topics = "MovieTimeAdd")
+    public void movieTimeUpdater(String payload) {
+        System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            KafkaMovieTimeDTO kfkMovieTimeDTO = objectMapper.readValue(payload, KafkaMovieTimeDTO.class);
+
+            // UPDATE THE CINEMA DATA
+//            kafkaService.updateCinema(kfkMovieTimeDTO); // TODO: UPDATE MOVIE TIME
+            System.out.println("Deserialized CinemaDTO: " + kfkMovieTimeDTO); // TODO: REMOVE THIS
+        } catch (Exception e) {
+            System.out.println("Error deserializing CinemaDTO: " + e.getMessage()); // TODO: REMOVE THIS
         }
     }
 

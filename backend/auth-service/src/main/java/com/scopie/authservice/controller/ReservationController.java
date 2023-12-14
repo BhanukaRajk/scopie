@@ -1,6 +1,7 @@
 package com.scopie.authservice.controller;
 
 import com.scopie.authservice.dto.PaymentDTO;
+import com.scopie.authservice.dto.ReservationAvailabilityDTO;
 import com.scopie.authservice.dto.ReservationDTO;
 import com.scopie.authservice.entity.Reservation;
 import com.scopie.authservice.service.ReservationService;
@@ -13,11 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.CannotProceedException;
+import javax.security.auth.login.CredentialException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/reservation")
+@RequestMapping("/api/reservations")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,6 +38,23 @@ public class ReservationController {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("Reservation Success!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Reservation Failed! Error:" + e);
+        }
+    }
+
+    @PostMapping(value = "/availability")
+    public boolean[] checkReservationAvailability(@RequestBody ReservationAvailabilityDTO reservationAvailabilityDTO) throws CannotProceedException {
+        try {
+            if(reservationService.checkAvailability(reservationAvailabilityDTO)) {
+                return reservationService.getAvailability(reservationAvailabilityDTO);
+//                return ResponseEntity.status(HttpStatus.ACCEPTED).body("Reservation Success!");
+            } else {
+//                return ResponseEntity.status(HttpStatus.ACCEPTED).body("Not enough seats available!");
+                return new boolean[0];
+            }
+
+        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Reservation Failed! Error:" + e);
+            throw new CannotProceedException("Could not get data!");
         }
     }
 

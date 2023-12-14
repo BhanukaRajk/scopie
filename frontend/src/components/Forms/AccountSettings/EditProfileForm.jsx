@@ -1,31 +1,57 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { message } from "antd";
 
-import { getUserdata } from "../../../apis/profileAPI";
 
-const EditProfileForm = ({ onOpen, nuser }) => {
+import { getUserdata, editProfile } from "../../../apis/profileAPI";
+
+const EditProfileForm = ({ onOpen, thisUser }) => {
 
     const [userData, setUserData] = useState({
         firstName: "",
         lastName: "",
         userName: "",
     });
+    const [messageApi, contextHolder] = message.useMessage();
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await getUserdata();
+                const response = await getUserdata({ userName: thisUser });
                 setUserData(response.data);
             } catch {
                 console.log("error");
             }
         }
         fetchUser();
-    }, []);
+    }, [thisUser]);
+
+    const handleNameUpdate = async (event) => {
+        event.preventDefault();
+        if (userData.firstName === "" || userData.firstName === null) {
+            messageApi.open({
+                type: 'error',
+                content: 'First name cannot be empty!',
+            });
+        } else {
+            console.log(userData)
+            try {
+                const response = await editProfile(userData);
+                console.log(response);
+                messageApi.open({
+                    type: 'success',
+                    content: "Profile name successfully updated!",
+                });
+
+            } catch (error) {
+                console.error(error)
+            }
+        }
+    };
 
     const handleNameChange = (e) => {
-        setUserData({ ...userData, userName: nuser });
+        setUserData({ ...userData, userName: thisUser });
 
         const { name, value } = e.target;
         setUserData({ ...userData, [name]: value });
@@ -33,7 +59,7 @@ const EditProfileForm = ({ onOpen, nuser }) => {
 
     return (
         <>
-            {/* {contextHolder} */}
+            {contextHolder}
 
             <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-lg">
                 <div className="text-black text-lg font-semibold">Edit profile name</div>
@@ -65,7 +91,7 @@ const EditProfileForm = ({ onOpen, nuser }) => {
                     <button type="button" onClick={onOpen} className=" mt-2 text-md text-center bg-black hover:bg-gray-800 text-white hover:text-ehite py-2 rounded-lg font-semibold cursor-pointer border-none">
                         Change Password
                     </button>
-                    <button type="submit" className=" mt-2 text-md text-center bg-yellow-300 hover:bg-yellow-200 text-black hover:text-black py-2 rounded-lg font-semibold cursor-pointer border-none">
+                    <button type="button" onClick={handleNameUpdate} className=" mt-2 text-md text-center bg-yellow-300 hover:bg-yellow-200 text-black hover:text-black py-2 rounded-lg font-semibold cursor-pointer border-none">
                         Update
                     </button>
                 </form>
@@ -78,5 +104,5 @@ export default EditProfileForm;
 
 EditProfileForm.propTypes = {
     onOpen: PropTypes.func.isRequired,
-    nuser: PropTypes.string.isRequired,
+    thisUser: PropTypes.string.isRequired,
 }

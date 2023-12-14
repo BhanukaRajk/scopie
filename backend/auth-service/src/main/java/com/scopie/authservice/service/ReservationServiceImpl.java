@@ -1,11 +1,9 @@
 package com.scopie.authservice.service;
 
 import com.scopie.authservice.dto.PaymentDTO;
+import com.scopie.authservice.dto.ReservationAvailabilityDTO;
 import com.scopie.authservice.dto.ReservationDTO;
-import com.scopie.authservice.entity.Customer;
-import com.scopie.authservice.entity.Payment;
-import com.scopie.authservice.entity.Reservation;
-import com.scopie.authservice.entity.ReservedSeat;
+import com.scopie.authservice.entity.*;
 import com.scopie.authservice.kafka.dto.KafkaReservationDTO;
 import com.scopie.authservice.kafka.dto.KafkaReservedSeatDTO;
 import com.scopie.authservice.repository.*;
@@ -15,6 +13,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.naming.CannotProceedException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +44,7 @@ public class ReservationServiceImpl implements ReservationService {
     private PaymentRepository paymentRepository;
 
     @Autowired
-    KafkaTemplate<String, Integer> kafkaCancellationTemplate;
+    KafkaTemplate<String, Long> kafkaCancellationTemplate;
 
     @Autowired
     KafkaTemplate<String, KafkaReservationDTO> kafkaReservationTemplate;
@@ -91,10 +90,71 @@ public class ReservationServiceImpl implements ReservationService {
                     reservedSeat.getReservedSeatId(),
                     reservedSeat.getSeatId().getSeatId(),
                     reservedSeat.getMovieTimeId().getMovieTimeId(),
-                    reservedSeat.getReservationId().getReservationId()
+                    reservedSeat.getReservationId().getReservationId(),
+                    reservedSeat.getMovieDate()
             );
             kafkaReservedSeatTemplate.send("NewSeatReserve", kfkReservedSeat);
         }
+    }
+
+    // TODO: REMOVE THIS DUPLICATE
+//    public void checkAvailability(ReservationAvailabilityDTO reservationAvailabilityDTO) {
+//        MovieTime movieTime = movieTimeRepository.findByCinemaMovieTimeslot(
+//                reservationAvailabilityDTO.getCinemaId(),
+//                reservationAvailabilityDTO.getMovieId(),
+//                reservationAvailabilityDTO.getTimeSlotId()
+//        );
+//        movieTime.getReservedSeats();
+//        Integer reservedSeatCount = reservedSeatRepository.countByMovieTimeAndDate(movieTime.getMovieTimeId(), reservationAvailabilityDTO.getMovieDate());
+//    }
+
+    public boolean checkAvailability(ReservationAvailabilityDTO reservationAvailabilityDTO) {
+        MovieTime movieTime = movieTimeRepository.findByCinemaMovieTimeslot(
+                reservationAvailabilityDTO.getCinemaId(),
+                reservationAvailabilityDTO.getMovieId(),
+                reservationAvailabilityDTO.getTimeSlotId()
+        );
+
+        List<ReservedSeat> reservedSeats = reservedSeatRepository.findByMovieTimeAndDate(
+                movieTime.getMovieTimeId(),
+                reservationAvailabilityDTO.getMovieDate()
+        );
+
+        int totalReservedSeatsCount = reservedSeats.size();
+        int requestedSeatCount = reservationAvailabilityDTO.getSeatCount();
+
+        if (requestedSeatCount <= (Integer.parseInt(movieTime.getSeatCount()) - totalReservedSeatsCount)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean[] getAvailability(ReservationAvailabilityDTO reservationAvailabilityDTO) {
+        MovieTime movieTime = movieTimeRepository.findByCinemaMovieTimeslot(
+                reservationAvailabilityDTO.getCinemaId(),
+                reservationAvailabilityDTO.getMovieId(),
+                reservationAvailabilityDTO.getTimeSlotId()
+        );
+
+        List<ReservedSeat> reservedSeats = reservedSeatRepository.findByMovieTimeAndDate(
+                movieTime.getMovieTimeId(),
+                reservationAvailabilityDTO.getMovieDate()
+        );
+
+        int totalSeatCount = Integer.parseInt(movieTime.getSeatCount());
+
+        boolean[] seatAvailability = new boolean[totalSeatCount];
+        Arrays.fill(seatAvailability, true);
+
+        for (ReservedSeat reservedSeat : reservedSeats) {
+            int seatIndex = (int) reservedSeat.getSeatId().getSeatId() - 1;
+            if (seatIndex >= 0 && seatIndex < totalSeatCount) {
+                seatAvailability[seatIndex] = false;
+            }
+        }
+
+        return seatAvailability;
     }
 
     public Optional<Reservation> getReservationById(long reservationId) {

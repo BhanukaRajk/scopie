@@ -39,6 +39,7 @@ const SideNavBar = () => {
 			open={isOpen}
 			getContainer={false}
 			width={310}
+			style={{ position: "fixed", width: 310 }}
 		>
 			<div className="flex flex-col gap-4">
 				{drawerContent.map((item, index) => (
@@ -51,6 +52,7 @@ const SideNavBar = () => {
 								: " hover:bg-yellow-100 text-black hover:text-black transition-color font-semibold"
 							}`
 						}
+						onClick={closeDrawer}
 					>
 						{item.label}
 					</NavLink>

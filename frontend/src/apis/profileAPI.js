@@ -1,14 +1,14 @@
 import api from "./api";
 
-export const getUserdata = (user) => {
-    return api.get("/account/get-data", user)
+export const getUserdata = (userName) => {
+    return api.get("/auth/account/update/", { params: userName })
 }
 
 export const editProfile = (updates) => {
-    return api.put("/account/update-name", updates)
+    return api.patch("/auth/account/update", updates)
 }
 
 // SIGN UP NEW USER TO THE SYSTEM
 export const updatePassword = (data) => {
-    return api.post('/account/update-password', data);
+    return api.patch('/auth/account/change-password', data);
 }

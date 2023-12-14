@@ -1,5 +1,6 @@
 package com.scopie.authservice.dto;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import java.sql.Time;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Transactional
 public class MovieDTO {
     private long  movieId;
     private String title;

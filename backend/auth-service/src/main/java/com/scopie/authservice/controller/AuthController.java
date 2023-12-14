@@ -263,31 +263,31 @@ public class AuthController {
     }
 
     // GET ACCOUNT DETAILS FOR UPDATE
-    @GetMapping("/account/update")
-    public ResponseEntity<String> getProfileData(@RequestParam String userName) {
+    @GetMapping("/account/update/")
+    public ResponseEntity<ProfileUpdateDTO> getProfileData(@RequestParam EmailDTO userName) {
         try {
-            ProfileUpdateDTO currentUser = authService.getUserDetails(userName);
-            return ResponseEntity.status(HttpStatus.OK).body(currentUser.toString());
+            ProfileUpdateDTO currentUser = authService.getUserDetails(userName.getEmail());
+            return ResponseEntity.status(HttpStatus.OK).body(currentUser);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User data not found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
     // ACCOUNT PASSWORD CHANGE FROM INSIDE
     @PatchMapping("/account/change-password")
-    public ResponseEntity<String> updatePassword(@RequestBody PasswordChangeDTO updatedPasswords) {
+    public ResponseEntity<Map<String, String>> updatePassword(@RequestBody PasswordChangeDTO updatedPasswords) {
         if (Objects.equals(updatedPasswords.getNewPassword(), updatedPasswords.getConfPassword())) {
             try {
                 if (authService.updatePassword(updatedPasswords)) {
-                    return ResponseEntity.status(HttpStatus.CREATED).body("Password updated!");
+                    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("success","Password updated!"));
                 } else {
-                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid current password!");
+                    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("error", "Invalid current password!"));
                 }
             } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Password updating process failed!");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Password updating process failed!"));
             }
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Password does not match!");
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("error", "Password does not match!"));
         }
     }
 

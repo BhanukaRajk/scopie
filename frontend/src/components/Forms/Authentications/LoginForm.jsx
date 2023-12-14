@@ -2,10 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import useUser from "../../../hooks/useUser";
-
 import { message } from "antd";
-
 import { login } from "../../../apis/authAPI";
+import LOGO from "../../../assets/logo_white_nbg.png"
 
 const LoginForm = () => {
 
@@ -57,12 +56,12 @@ const LoginForm = () => {
                 console.log(response.data);
                 console.log(response.data.error);
                 if (response.data.error != null) {
-                    
+
                     messageApi.open({
                         type: 'error',
                         content: response.data.error
                     })
-                    
+
                 } else {
                     sessionStorage.setItem("token", response.data.token);
                     setUserContext(credentials.username);
@@ -88,38 +87,43 @@ const LoginForm = () => {
         <>
             {contextHolder}
 
-            <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-lg">
-                <h1 className="text-black font-serif">Scopie</h1>
-                <form onSubmit={handleLoginCredentials} className="mt-8 w-64 flex flex-col">
+            <div className="bg-white border text-black border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-lg">
+                {/* <h1 className="text-black font-serif">Scopie</h1> */}
+                <img className="rounded-md" style={{ height: "4rem" }} src={LOGO} alt={"Scopie"} />
+                <div className="text-md">Login</div>
+
+                <form onSubmit={handleLoginCredentials} className="mt-4 w-64 flex flex-col">
                     <div className="mb-4">
+                        <label htmlFor="username" className="text-black text-xs font-semibold">Email <span className=" text-red-600">*</span></label>
                         <input
                             type="email"
                             id="username"
                             name="username"
                             onChange={handleInputChange}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                            placeholder="Username*"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+                            // placeholder="Username*"
                         />
                     </div>
                     <div className="mb-4">
+                        <label htmlFor="password" className="text-black text-xs font-semibold">Password <span className=" text-red-600">*</span></label>
                         <input
                             type="password"
                             id="password"
                             name="password"
                             onChange={handleInputChange}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                            placeholder="Password*"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+                            // placeholder="Password*"
                         />
                     </div>
-                    <button type="submit" className=" text-md text-center bg-blue-700 hover:bg-blue-400 text-white hover:text-white py-2 rounded-lg font-semibold cursor-pointer">
+                    <button type="submit" className=" text-md text-center bg-yellow-400 hover:bg-yellow-200 text-black hover:text-black hover:shadow-md border-none py-2 rounded-lg font-semibold transition-colors cursor-pointer">
                         Log In
                     </button>
                 </form>
-                <NavLink to="/forgot-password/verify-username" className="text-sm text-blue-900 mt-4 cursor-pointer">Forgot password?</NavLink>
+                <NavLink to="/forgot-password/verify-username" className="text-sm text-yellow-700 hover:text-yellow-400 mt-4 cursor-pointer">Forgot password?</NavLink>
             </div>
-            <div className="bg-white border border-gray-300 text-center w-80 py-4 rounded-lg">
+            <div className="bg-white border border-gray-300 text-center w-80 py-3 rounded-lg">
                 <span className="text-sm text-black">Don&apos;t have an account? </span>
-                <NavLink to="/sign-up" className="text-blue-900 text-sm font-semibold cursor-pointer">Sign up</NavLink>
+                <NavLink to="/sign-up" className="text-yellow-700 hover:text-yellow-400 text-sm font-semibold cursor-pointer">Sign up</NavLink>
             </div>
 
         </>

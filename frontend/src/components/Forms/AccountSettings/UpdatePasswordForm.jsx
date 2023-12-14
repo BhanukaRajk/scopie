@@ -9,18 +9,19 @@ import { updatePassword } from "../../../apis/profileAPI";
 const UpdatePasswordForm = ({ onClose, user }) => {
 
     const [passwords, setPasswords] = useState({
-        userName: "",
+        userName: user,
         oldPassword: "",
-        newpassword: "",
+        newPassword: "",
         confPassword: ""
     });
 
     const [messageApi, contextHolder] = message.useMessage();
 
     const handlePasswordInputChange = (e) => {
-        if (passwords.userName === null || passwords.userName === "") {
-            setPasswords({ ...passwords, userName: user });
-        }
+        // if (passwords.userName === null || passwords.userName == "") {
+        setPasswords({ ...passwords, userName: user });
+        // }
+
         const { name, value } = e.target;
         setPasswords({ ...passwords, [name]: value });
     };
@@ -28,22 +29,21 @@ const UpdatePasswordForm = ({ onClose, user }) => {
     const handleChangePassword = async (event) => {
         event.preventDefault();
         if (
-            passwords.password === "" || passwords.password === null ||
+            passwords.newPassword === "" || passwords.newPassword === null ||
             passwords.confPassword === "" || passwords.confPassword === null ||
-            passwords.password.length < 8
+            passwords.newPassword.length < 8
         ) {
             messageApi.open({
                 type: 'error',
                 content: 'Your password must be 8 characters or more long!',
             });
-        } else if (passwords.password !== passwords.confPassword) {
+        } else if (passwords.newPassword !== passwords.confPassword) {
             messageApi.open({
                 type: 'error',
                 content: 'Passwords do not match!',
             });
         } else {
             try {
-                console.log(passwords);
                 const response = await updatePassword(passwords);
                 if (response.data.error != null) {
                     messageApi.open({
@@ -64,8 +64,8 @@ const UpdatePasswordForm = ({ onClose, user }) => {
                 });
             }
         }
-
     }
+
     return (
         <>
             {contextHolder}
@@ -76,7 +76,6 @@ const UpdatePasswordForm = ({ onClose, user }) => {
                 <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-md">
                     <div className="text-black font-semibold text-lg">Change Password</div>
                     <form
-                        onSubmit={handleChangePassword}
                         className="mt-4 w-64 flex flex-col">
                         <div className="mb-4">
                             <label htmlFor="old_password" className="text-black text-xs font-semibold">Current password <span className=" text-red-600">*</span></label>
@@ -111,10 +110,10 @@ const UpdatePasswordForm = ({ onClose, user }) => {
                                 // placeholder="Confirm New Password*"
                                 required />
                         </div>
-                        <button type="submit" className=" text-md text-center bg-yellow-400 hover:bg-yellow-200 border-none text-black hover:text-black py-2 rounded-lg font-semibold cursor-pointer">
+                        <button type="button" onClick={handleChangePassword} className=" text-md text-center bg-yellow-400 hover:bg-yellow-200 border-none text-black hover:text-black py-2 rounded-lg font-semibold cursor-pointer">
                             Change Password
                         </button>
-                        <a onClick={onClose} className="text-sm text-center text-black hover:text-yellow-600 font-semibold mt-4 cursor-pointer">Cancel</a>
+                        <button onClick={onClose} type="reset" className="text-sm text-center text-black hover:text-yellow-600 font-semibold mt-4 cursor-pointer bg-transparent border-none">Cancel</button>
 
                     </form>
                 </div>

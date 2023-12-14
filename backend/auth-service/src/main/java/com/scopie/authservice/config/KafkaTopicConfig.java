@@ -24,11 +24,11 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("test_message").build();
     }
 
+
     @Bean
     public NewTopic newReservationRemoveTopic() {
         return TopicBuilder.name("NewReserveCancellation").build();
     }
-
 
     // FROM CINEMA SIDE
     @Bean

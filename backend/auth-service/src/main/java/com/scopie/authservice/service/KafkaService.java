@@ -7,4 +7,6 @@ import javax.naming.CannotProceedException;
 public interface KafkaService {
 
     void updateCinema(KafkaCinemaDTO kfkCinemaDTO) throws CannotProceedException;
+
+    void addNewSeat(long seatId);
 }

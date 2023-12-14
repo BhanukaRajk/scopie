@@ -1,6 +1,7 @@
 package com.scopie.authservice.service;
 
 import com.scopie.authservice.dto.PaymentDTO;
+import com.scopie.authservice.dto.ReservationAvailabilityDTO;
 import com.scopie.authservice.dto.ReservationDTO;
 import com.scopie.authservice.entity.Reservation;
 
@@ -17,4 +18,7 @@ public interface ReservationService {
 
     void doPayment(PaymentDTO payment) throws CannotProceedException;
 
+    boolean checkAvailability(ReservationAvailabilityDTO reservationAvailabilityDTO);
+
+    boolean[] getAvailability(ReservationAvailabilityDTO reservationAvailabilityDTO);
 }

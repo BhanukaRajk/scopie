@@ -1,6 +1,7 @@
 package com.scopie.authservice.controller;
 
 import com.scopie.authservice.dto.MovieDTO;
+import com.scopie.authservice.dto.MovieShowsDTO;
 import com.scopie.authservice.entity.Movie;
 import com.scopie.authservice.kafka.KafkaProducer;
 import com.scopie.authservice.service.MovieService;
@@ -27,10 +28,10 @@ public class MovieController {
     private MovieService movieService;
 
     @Autowired
-    KafkaTemplate<String, Integer> kafkaTemplate;
+    KafkaTemplate<String, Long> kafkaTemplate;
 
     // GET AND SEND ALL MOVIES TO THE MOVIES PAGE WITH FILTERS
-    @GetMapping(value = "/")
+    @GetMapping(value = "")
     public List<MovieDTO> getMovies(@Nullable @RequestParam String filter) {
         if(filter != null) {
 //            return movieService.getMovies(filter);
@@ -41,37 +42,11 @@ public class MovieController {
         }
     }
 
+
     // SEND THE SPECIFIC MOVIE DETAILS WHEN CUSTOMER CLICKS ON SOME MOVIE
-    @GetMapping(value = "/:id")
-    public ResponseEntity<String> expandSpecificMovie(@RequestParam long movieId) {
-        return ResponseEntity.status(HttpStatus.OK).body(movieService.movieDetails(movieId).toString());
+    @GetMapping(value = "/")
+    public ResponseEntity<MovieShowsDTO> expandSpecificMovie(@RequestParam long movieId) {
+        return ResponseEntity.status(HttpStatus.OK).body(movieService.movieDetails(movieId));
     }
-
-
-
-
-
-
-
-
-
-    // TODO: REMOVE THIS FUNCTION
-    @GetMapping(value = "/test")
-    public String testMovies() {
-        kafkaTemplate.send("movie_details", 2);
-        return "Test function working!";
-    }
-
-    @GetMapping(value = "/test2")
-    public String test2Movies() {
-        kafkaTemplate.send("movie_details", 2);
-        return "Test 2 function working!";
-    }
-
-    @GetMapping(value = "/test3")
-    public String testKafka() {
-        return kafkaTemplate.toString();
-    }
-
 
 }

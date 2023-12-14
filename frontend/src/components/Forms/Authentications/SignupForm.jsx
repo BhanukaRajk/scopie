@@ -1,11 +1,12 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import { message } from "antd";
 
 import { getVerificationCode } from "../../../apis/authAPI";
-import { NavLink } from "react-router-dom";
+import LOGO from "../../../assets/logo_white_nbg.png"
 
 const SignUpForm = ({ onOpen }) => {
 
@@ -82,9 +83,9 @@ const SignUpForm = ({ onOpen }) => {
             {contextHolder}
 
             <div className="bg-white border text-black border-gray-300 w-96 py-5 flex items-center flex-col mb-3 rounded-lg">
-                <div className="text-black font-serif text-3xl">Scopie</div>
-                <div className="text-md">Create new account</div>
-                <form onSubmit={handleSignUp} className="mt-5 w-10/12 flex flex-col">
+                <img className="rounded-md" style={{ height: "4rem" }} src={LOGO} alt={"Scopie"} />
+                <div className="text-md">Sign up</div>
+                <form onSubmit={handleSignUp} className="mt-3 w-10/12 flex flex-col">
                     <div className="grid sm:gap-6 sm:grid-cols-2">
                         <div>
                             <label htmlFor="first_name" className="text-black text-xs font-semibold">First name <span className=" text-red-600">*</span></label>
@@ -107,14 +108,14 @@ const SignUpForm = ({ onOpen }) => {
                         <label htmlFor="confirm_password" className="text-black text-xs font-semibold">Confirm password <span className=" text-red-600">*</span></label>
                         <input type="password" id="confirm_password" name="confPassword" onChange={handleInputChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1.5" />
                     </div>
-                    <button type="submit" className=" text-md text-center bg-blue-700 hover:bg-blue-400 text-white hover:text-white py-2 rounded font-semibold cursor-pointer">
+                    <button type="submit" className="mt-2 text-md text-center bg-yellow-400 hover:bg-yellow-200 text-black hover:text-black hover:shadow-md transition-colors border-none py-2 rounded font-semibold cursor-pointer">
                         Sign Up
                     </button>
                 </form>
             </div>
             <div className="bg-white border border-gray-300 text-center w-96 py-3 rounded-lg">
                 <span className="text-sm text-black">Already have an account? </span>
-                <NavLink to="/login" className="text-blue-900 text-sm font-semibold cursor-pointer">Log In</NavLink>
+                <NavLink to="/login" className="text-yellow-700 hover:text-yellow-400 text-sm font-semibold cursor-pointer">Log In</NavLink>
             </div>
         </>
     );

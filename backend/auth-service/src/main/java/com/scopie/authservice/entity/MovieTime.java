@@ -25,7 +25,7 @@ public class MovieTime {
     @JoinColumn(referencedColumnName = "movie_id", name = "movie_id", nullable = false)
     private Movie movieId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "cinema_id", name = "cinema_id", nullable = false)
     private Cinema cinemaId;
 

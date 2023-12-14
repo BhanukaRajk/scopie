@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -29,5 +31,8 @@ public class ReservedSeat {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "seat_id", name = "seat_id", nullable = false)
     private Seat seatId;
+
+    @Column(name = "movie_date", nullable = false)
+    private Date movieDate;
 
 }

@@ -37,11 +37,11 @@ public class KafkaProducer {
     }
 
     @Bean
-    public ProducerFactory<String, Integer> producerFactory() {
+    public ProducerFactory<String, Long> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
     @Bean
-    public KafkaTemplate<String, Integer> kafkaTemplate(ProducerFactory<String, Integer> reservationCancelProducerFactory) {
+    public KafkaTemplate<String, Long> kafkaTemplate(ProducerFactory<String, Long> reservationCancelProducerFactory) {
         return new KafkaTemplate<>(reservationCancelProducerFactory);
     } // RESERVATION CANCELLER
 

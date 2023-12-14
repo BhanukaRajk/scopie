@@ -36,7 +36,7 @@ public class TimeSlot {
     @Enumerated(EnumType.STRING)
     public Day day;
 
-    @OneToMany(mappedBy = "slotId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "slotId", fetch = FetchType.EAGER)
     private List<MovieTime> movieTimes;
 
 }

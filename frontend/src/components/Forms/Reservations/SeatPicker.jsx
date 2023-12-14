@@ -1,56 +1,220 @@
-// import React, { useState } from "react";
-import PropTypes from "prop-types";
-import { Checkbox, Col, Row } from 'antd';
-
-const onChange = (checkedValues) => {
-  console.log('checked = ', checkedValues);
-};
-
 // eslint-disable-next-line no-unused-vars
-const SeatPicker = ({ seatSpace, onClose }) => {
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+
+const SeatPicker = ({
+    isSelectionOpen,
+    seatAvailability,
+    onSelectionClose,
+    handleReservation,
+    setSeatSelection,
+}) => {
+    const seatsPerRow = 10;
+    const rows = Math.ceil(seatAvailability.length / seatsPerRow);
+
+    const initialSeatsData = Array.from({ length: rows }, (_, rowIndex) =>
+        Array.from({ length: seatsPerRow }, (_, seatIndex) => ({
+            id: rowIndex * seatsPerRow + seatIndex + 1,
+            // status: seatIndex % 2 === 0 ? "picked" : "available",
+            // status: seatAvailability[rowIndex * seatsPerRow + seatIndex],
+            status: seatAvailability[rowIndex * seatsPerRow + seatIndex] ? "available" : "picked",
+        }))
+    );
+
+    const [seatsData, setSeatsData] = useState(initialSeatsData);
+
+    useEffect(() => {
+        const updatedSeatsData = Array.from({ length: rows }, (_, rowIndex) =>
+            Array.from({ length: seatsPerRow }, (_, seatIndex) => ({
+                id: rowIndex * seatsPerRow + seatIndex + 1,
+                // status: seatAvailability[rowIndex * seatsPerRow + seatIndex],
+                status: seatAvailability[rowIndex * seatsPerRow + seatIndex] ? "available" : "picked",
+            }))
+        );
+        setSeatsData(updatedSeatsData);
+    }, [seatAvailability, rows, seatsPerRow]);
+
+    const handleSeatClick = (seat) => {
+        if (seat.status === "available") {
+            const updatedSeatsData = seatsData.map((row) =>
+                row.map((s) => (s.id === seat.id ? { ...s, status: "selected" } : s))
+            );
+            setSeatsData(updatedSeatsData);
+        } else if (seat.status === "selected") {
+            const updatedSeatsData = seatsData.map((row) =>
+                row.map((s) => (s.id === seat.id ? { ...s, status: "available" } : s))
+            );
+            setSeatsData(updatedSeatsData);
+        }
+    };
+
+    const pickSelection = () => {
+        let i = 1;
+        let Selections = [];
+        seatsData.map((row) => {
+            row.map((s) => {
+                if(s.status == "selected") {
+                    Selections.push(i);
+                }
+                i++;
+            })
+        });
+        setSeatSelection(Selections);
+        handleReservation();
+    }
 
     return (
-        <>
-            <div className="flex flex-col text-center fixed top-32 left-10  bg-gray-100 rounded-md border border-black p-4">
-                <div className="w-full mb-4 border-b border-gray-700 text-black">Screen</div>
-                <div>
-                    <Checkbox.Group
-                        style={{
-                            width: '100%',
-                        }}
-                        onChange={onChange}
-                    >
-                        <Row>
-                            <Col span={8}>
-                                <Checkbox value="A">A</Checkbox>
-                            </Col>
-                            <Col span={8}>
-                                <Checkbox value="B">B</Checkbox>
-                            </Col>
-                            <Col span={8}>
-                                <Checkbox value="C">C</Checkbox>
-                            </Col>
-                            <Col span={8}>
-                                <Checkbox value="D">D</Checkbox>
-                            </Col>
-                            <Col span={8}>
-                                <Checkbox value="E">E</Checkbox>
-                            </Col>
-                        </Row>
-                    </Checkbox.Group>
-                </div>
-                <button type="submit" className="mt-4 text-md text-center bg-blue-700 hover:bg-blue-400 text-white hover:text-white py-2 rounded font-semibold cursor-pointer">
+        <div className={` ${isSelectionOpen ? "fixed" : "hidden"} fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 border border-gray-300 shadow-md rounded-md`}>
+            <div className="w-full text-black text-center mb-4">
+                <h2 className="text-lg font-bold">Select Your Seats</h2>
+            </div>
+            <div className="py-1 mb-4 text-black text-center border-b-2 border-b-black w-full">
+                Screen
+            </div>
+            <div className="flex flex-col">
+                {seatsData.map((row, rowIndex) => (
+                    <div key={`row-${rowIndex}`} className="flex mb-2">
+                        {row.map((seat) => (
+                            <div
+                                key={seat.id}
+                                className={`w-8 h-8 mr-2 flex items-center justify-center cursor-pointer text-gray-700 border-x-4 border-b-4 border-gray-500 rounded ${seat.status === "picked" ? "bg-red-300" : seat.status === "selected" ? "bg-green-300" : "bg-gray-200"
+                                    }`}
+                                onClick={() => handleSeatClick(seat)}
+                            >
+                                {seat.status !== "picked" && seat.id}
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
+            <div className="flex justify-between items-center gap-3 mt-3">
+                <button
+                    type="button"
+                    className="bg-black text-white w-24 py-1 rounded border-none hover:bg-gray-700"
+                    onClick={onSelectionClose}
+                >
+                    Cancel
+                </button>
+                <button
+                    type="button"
+                    className="text-black bg-yellow-400 w-24 py-1 rounded border-none hover:bg-yellow-200 hover:shadow-md"
+                    onClick={pickSelection}
+                >
                     Reserve
                 </button>
-                <a className="text-black mt-4 text-sm cursor-pointer" onClick={onClose}>Cancel</a>
             </div>
-        </>
-    )
-}
+        </div>
+    );
+};
 
 export default SeatPicker;
 
 SeatPicker.propTypes = {
-    seatSpace: PropTypes.any,
-    onClose: PropTypes.func,
-}
+    seatAvailability: PropTypes.arrayOf(PropTypes.bool),
+    onSelectionClose: PropTypes.func,
+    handleReservation: PropTypes.func,
+    setSeatSelection: PropTypes.func,
+    isSelectionOpen: PropTypes.bool,
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // eslint-disable-next-line no-unused-vars
+// import React, { useState } from "react";
+// import PropTypes from "prop-types";
+
+
+// const SeatPicker = ({
+//     isSelectionOpen,
+//     // seatAvaialability,
+//     onSelectionClose,
+//     handleReservation
+// }) => {
+
+//     const initialSeatsData = Array.from({ length: 5 }, (_, rowIndex) =>
+//         Array.from({ length: 10 }, (_, seatIndex) => ({
+//             id: `${rowIndex}-${seatIndex + 1}`,
+//             status: seatIndex % 2 === 0 ? "picked" : "available", // Sample seat status
+//         }))
+//     );
+
+//     const [seatsData, setSeatsData] = useState(initialSeatsData);
+
+//     const handleSeatClick = (rowIndex, seatIndex) => {
+//         // Handle seat click based on your logic (e.g., toggle seat status)
+//         if (seatsData[rowIndex][seatIndex].status !== "picked") {
+//             const updatedSeatsData = [...seatsData];
+//             updatedSeatsData[rowIndex][seatIndex].status =
+//                 updatedSeatsData[rowIndex][seatIndex].status === "available"
+//                     ? "selected"
+//                     : "available";
+//             setSeatsData(updatedSeatsData);
+//         }
+//     };
+
+//     return (
+//         <div className={` ${isSelectionOpen ? "fixed" : "hidden"} fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 border border-gray-300 shadow-md rounded-md`}>
+//             <div className="w-full text-black text-center mb-4">
+//                 <h2 className="text-lg font-bold">Select Your Seats</h2>
+//             </div>
+//             <div className="py-1 mb-4 text-black text-center border-b-2 border-b-black w-full">
+//                 Screen
+//             </div>
+//             <div className="flex flex-col">
+//                 {seatsData.map((row, rowIndex) => (
+//                     <div key={`row-${rowIndex}`} className="flex mb-2">
+//                         {row.map((seat, seatIndex) => (
+//                             <div
+//                                 key={seat.id}
+//                                 className={`w-8 h-8 mr-2 flex items-center justify-center cursor-pointer text-gray-700 border border-gray-300 rounded ${seat.status === "picked" ? "bg-red-300" : seat.status === "selected" ? "bg-green-300" : "bg-gray-200"
+//                                     }`}
+//                                 onClick={() => handleSeatClick(rowIndex, seatIndex)}
+//                             >
+//                                 {seat.status !== "picked" && seatIndex + 1}
+//                             </div>
+//                         ))}
+//                     </div>
+//                 ))}
+//             </div>
+//             <div className="flex justify-between items-center mt-3">
+//                 <button
+//                     type="button"
+//                     className="bg-black text-white w-24 py-1 rounded border-none hover:bg-gray-700"
+//                     onClick={onSelectionClose}
+//                 >
+//                     Cancel
+//                 </button>
+//                 <button
+//                     className="text-black bg-yellow-400 w-24 py-1 rounded border-none hover:bg-yellow-200 hover:shadow-md"
+//                     onClick={handleReservation}
+//                 >
+//                     Reserve
+//                 </button>
+//             </div>
+//         </div>
+//     );
+// };
+
+// export default SeatPicker;
+
+// SeatPicker.propTypes = {
+//     seatAvaialability: PropTypes.any,
+//     onSelectionClose: PropTypes.func,
+//     handleReservation: PropTypes.func,
+//     isSelectionOpen: PropTypes.bool,
+// }

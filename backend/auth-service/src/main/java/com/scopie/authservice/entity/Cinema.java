@@ -30,6 +30,6 @@ public class Cinema {
     private String contact;
 
 
-    @OneToMany(mappedBy = "cinemaId", fetch = FetchType.LAZY) // USE THE ATTRIBUTE NAME (NOT THE COLUMN NAME)
+    @OneToMany(mappedBy = "cinemaId", fetch = FetchType.EAGER) // USE THE ATTRIBUTE NAME (NOT THE COLUMN NAME)
     private List<MovieTime> movieTimes;
 }

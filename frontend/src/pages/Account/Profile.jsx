@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import EditProfileForm from "../../components/Forms/AccountSettings/EditProfileForm";
 import UpdatePasswordForm from "../../components/Forms/AccountSettings/UpdatePasswordForm";
@@ -17,10 +17,11 @@ const Profile = () => {
         toggleNewPasswordFrom(false);
     }
 
+
     return (
         <>
             <div className="h-screen w-screen bg-gray-50 flex flex-col justify-center items-center login-background">
-                <EditProfileForm onOpen = {onOpen} nuser={user} />
+                <EditProfileForm onOpen = {onOpen} thisUser={user} />
 
                 <div className={`${isNewPasswordForm ? "block" : "hidden"}`}>
                     <UpdatePasswordForm onClose={onClose} user={user} />

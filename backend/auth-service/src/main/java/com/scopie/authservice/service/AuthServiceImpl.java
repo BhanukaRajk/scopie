@@ -108,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
     public ProfileUpdateDTO getUserDetails(String username) {
         Customer customer = customerRepo.findByEmail(username);
         return new ProfileUpdateDTO(
-                customer.getFirstName(),
+                customer.getEmail(),
                 customer.getFirstName(),
                 customer.getLastName()
         );
