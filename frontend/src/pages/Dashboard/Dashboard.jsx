@@ -39,7 +39,6 @@ const Dashboard = () => {
         const fetchRecents = async () => {
             try {
                 const response = await getMovies();
-                console.log("Movies: " + response.data);
                 setNewReleases(response.data);
             } catch {
                 messageApi.open({
@@ -52,9 +51,8 @@ const Dashboard = () => {
 
         const fetchReservations = async () => {
             try {
-                const response = await getReservations(user);
-                console.log("My reservations: " + response.data);
-                setUpcomingReservations(response.data);
+                const response = await getReservations({ username: user });
+                setUpcomingReservations((response.data));
             } catch {
                 messageApi.open({
                     type: "error",
@@ -71,16 +69,16 @@ const Dashboard = () => {
             {contextHolder}
 
             <div className="flex flex-col gap-3 mx-3">
-                <div className="mt-4 w-full text-2xl text-black font-semibold text-center lg:text-start">Upcoming reservations</div>
+                <div className="mt-4 w-full text-2xl text-black font-semibold text-center">Upcoming reservations</div>
                 <div className="w-full border border-gray-300 my-2"></div>
-                <div className="flex flex-col items-center sm:items-start sm:flex-row flex-wrap gap-5 w-full min-w-fit">
+                <div className="flex flex-col items-center md:items-start md:flex-row flex-wrap gap-5 w-full">
                     {upcomingReservations.length == 0 ? <Empty description="You don't have any reservations" /> :
                         upcomingReservations.map((reservation, index) => (
-                            <ReservationCard movie={reservation} key={index} />
+                            <ReservationCard reservation={reservation} key={index} />
                         ))}
                 </div>
 
-                <div className="mt-8 w-full text-2xl text-black font-semibold text-center lg:text-start">New releases</div>
+                <div className="mt-8 w-full text-2xl text-black font-semibold text-center">Now Showing</div>
                 <div className="w-full border border-gray-300 my-2"></div>
                 <div className="flex flex-col items-center sm:items-start sm:flex-row flex-wrap gap-5 w-full">
                     {movies.length == 0 ? <Empty description="No recently released movies" /> :

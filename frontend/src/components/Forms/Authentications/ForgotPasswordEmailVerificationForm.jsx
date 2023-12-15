@@ -1,24 +1,17 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-
+import { useNavigate } from "react-router-dom";
 import { verifyUser, resendCode } from "../../../apis/authAPI";
+import { message } from "antd";
 
-import {
-    message,
-} from "antd";
-
-// eslint-disable-next-line no-unused-vars
 const ForgotPasswordEmailVerificationForm = ({ isOpen, onClose }) => {
 
     const navigate = useNavigate();
-
     const [verificationData, setVerificationData] = useState({
         email: "",
         otp: "",
     });
-
     const [messageApi, contextHolder] = message.useMessage();
 
     const handleInputChange = (e) => {
@@ -72,9 +65,6 @@ const ForgotPasswordEmailVerificationForm = ({ isOpen, onClose }) => {
                     onClose();
                     navigate("/forgot-password/add-new-password")
                 }
-
-
-
             } catch (error) {
                 console.error(error);
                 messageApi.open({
@@ -113,12 +103,12 @@ const ForgotPasswordEmailVerificationForm = ({ isOpen, onClose }) => {
                                     onChange={handleInputChange}
                                 />
                             </div>
-                            <button type="submit" className=" text-md text-center bg-blue-700 hover:bg-blue-400 text-white hover:text-white py-2 rounded-lg font-semibold cursor-pointer">
+                            <button type="submit" className=" text-md text-center bg-yellow-400 hover:bg-yellow-200 text-black hover:text-black hover:shadow-md border-none py-2 rounded-lg font-semibold cursor-pointer">
                                 Verify
                             </button>
                         </form>
                         <div className=" text-xs text-black my-2">
-                            Didn&apos;t get the code? <a onClick={handleResend} className=" text-blue-900 mt-4 cursor-pointer">Resend</a>
+                            Didn&apos;t get the code? <a onClick={handleResend} className=" text-yellow-700 hover:text-yellow-400 mt-4 cursor-pointer">Resend</a>
                         </div>
                         <a className="text-black mt-4 text-sm cursor-pointer" onClick={onClose}>Cancel</a>
                     </div>
@@ -133,7 +123,6 @@ export default ForgotPasswordEmailVerificationForm;
 
 ForgotPasswordEmailVerificationForm.propTypes = {
     enteredEmail: PropTypes.string,
-
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
 }

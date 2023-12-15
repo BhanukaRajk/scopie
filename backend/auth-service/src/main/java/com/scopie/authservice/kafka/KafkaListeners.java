@@ -1,7 +1,6 @@
 package com.scopie.authservice.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.scopie.authservice.kafka.dto.KafkaCinemaDTO;
 import com.scopie.authservice.kafka.dto.KafkaMovieDTO;
 import com.scopie.authservice.kafka.dto.KafkaMovieTimeDTO;
@@ -14,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.kafka.annotation.KafkaListener;
 
-import java.util.List;
-
 @Component
 public class KafkaListeners {
 
@@ -25,7 +22,6 @@ public class KafkaListeners {
     @Autowired
     private MovieService movieService;
 
-    private final ObjectMapper objMapper = new ObjectMapper();
 
     // GET THE KAFKA MESSAGE WHEN CINEMA SIDE MAKE CHANGES ON ITS DETAILS
     // TODO: THIS IS ONLY FOR TESTING PURPOSE

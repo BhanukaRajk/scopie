@@ -2,9 +2,7 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import PropTypes from "prop-types";
-
 import { message } from "antd";
-
 import { getVerificationCode } from "../../../apis/authAPI";
 import LOGO from "../../../assets/logo_white_nbg.png"
 

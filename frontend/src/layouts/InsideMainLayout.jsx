@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
-import useUser from "../hooks/useUser";
+import { UserContext } from "../contexts/UserContext";
 
 import { Skeleton } from 'antd';
 import SideNavBar from "../components/Common/SideNavBar";
@@ -9,7 +9,7 @@ import TopNavBar from "../components/Common/TopNavBar";
 
 const InsideMainLayout = () => {
     const navigate = useNavigate();
-    const { user } = useUser();
+    const { user } = useContext(UserContext);
 
     useEffect(() => {
         if (!user) {
@@ -18,9 +18,7 @@ const InsideMainLayout = () => {
     }, [user, navigate]);
 
     if (!user) {
-        return (
-            <Skeleton active />
-        );
+        return <Skeleton active />;
     } else {
         return (
             <>

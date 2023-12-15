@@ -1,9 +1,9 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import useUser from "../../../hooks/useUser";
 import { message } from "antd";
 import { login } from "../../../apis/authAPI";
+import useUser from "../../../hooks/useUser";
 import LOGO from "../../../assets/logo_white_nbg.png"
 
 const LoginForm = () => {
@@ -52,9 +52,6 @@ const LoginForm = () => {
         } else {
             try {
                 const response = await login(credentials);
-                console.log(response);
-                console.log(response.data);
-                console.log(response.data.error);
                 if (response.data.error != null) {
 
                     messageApi.open({
@@ -88,7 +85,6 @@ const LoginForm = () => {
             {contextHolder}
 
             <div className="bg-white border text-black border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-lg">
-                {/* <h1 className="text-black font-serif">Scopie</h1> */}
                 <img className="rounded-md" style={{ height: "4rem" }} src={LOGO} alt={"Scopie"} />
                 <div className="text-md">Login</div>
 

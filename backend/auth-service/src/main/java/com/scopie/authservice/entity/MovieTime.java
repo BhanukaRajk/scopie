@@ -21,7 +21,7 @@ public class MovieTime {
     @Column(name = "movie_time_id", nullable = false)
     private long movieTimeId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "movie_id", name = "movie_id", nullable = false)
     private Movie movieId;
 
@@ -29,7 +29,7 @@ public class MovieTime {
     @JoinColumn(referencedColumnName = "cinema_id", name = "cinema_id", nullable = false)
     private Cinema cinemaId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "slot_id", name = "time_slot", nullable = false)
     private TimeSlot slotId;
 

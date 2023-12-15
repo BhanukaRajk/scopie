@@ -37,7 +37,7 @@ const SideNavBar = () => {
 			closable={false}
 			onClose={closeDrawer}
 			open={isOpen}
-			getContainer={false}
+			// getContainer={false}
 			width={310}
 			style={{ position: "fixed", width: 310 }}
 		>

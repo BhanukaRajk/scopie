@@ -1,11 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { message } from "antd";
-
 import { resetPassword } from "../../../apis/authAPI";
 import { NavLink } from "react-router-dom";
+import LOGO from "../../../assets/logo_white_nbg.png"
 
 const ForgotPasswordResetForm = () => {
     const [passwords, setPasswords] = useState({
@@ -79,7 +78,7 @@ const ForgotPasswordResetForm = () => {
             {contextHolder}
 
             <div className="bg-white border border-gray-300 w-80 py-8 flex items-center flex-col mb-3 rounded-lg">
-                <h1 className="text-black font-serif">Scopie</h1>
+                <img className="rounded-md" style={{ height: "4rem" }} src={LOGO} alt={"Scopie"} />
                 <form onSubmit={handleChangePassword} className="mt-4 w-64 flex flex-col">
                     <div className="mb-4">
                         <input
@@ -101,11 +100,11 @@ const ForgotPasswordResetForm = () => {
                             placeholder="Confirm New Password"
                             required />
                     </div>
-                    <button type="submit" className=" text-md text-center bg-blue-700 hover:bg-blue-400 text-white hover:text-white py-2 rounded-lg font-semibold cursor-pointer">
+                    <button type="submit" className=" text-md text-center bg-yellow-400 hover:bg-yellow-200 text-black hover:text-black hover:shadow-md border-none py-2 rounded-lg font-semibold cursor-pointer">
                         Change Password
                     </button>
                 </form>
-                <NavLink to="/login" className="text-sm text-blue-900 mt-4 cursor-pointer">Back to login</NavLink>
+                <NavLink to="/login" className="text-sm text-yellow-700 hover:text-yellow-400 mt-4 cursor-pointer">Back to login</NavLink>
             </div>
         </>
     );

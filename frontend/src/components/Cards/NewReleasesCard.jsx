@@ -22,5 +22,5 @@ export default NewReleasesCard;
 
 NewReleasesCard.propTypes = {
     movie: PropTypes.object,
-    key: PropTypes.number,
+    identity: PropTypes.number,
 };

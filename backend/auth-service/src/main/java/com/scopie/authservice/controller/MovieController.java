@@ -34,8 +34,8 @@ public class MovieController {
     @GetMapping(value = "")
     public List<MovieDTO> getMovies(@Nullable @RequestParam String filter) {
         if(filter != null) {
-//            return movieService.getMovies(filter);
-            return movieService.getMovies();
+            return movieService.getMovies(filter);
+//            return movieService.getMovies();
 
         } else {
             return movieService.getMovies();

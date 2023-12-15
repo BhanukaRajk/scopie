@@ -1,18 +1,19 @@
 package com.scopie.authservice.service;
 
+import com.scopie.authservice.dto.MyReservationDTO;
 import com.scopie.authservice.dto.PaymentDTO;
 import com.scopie.authservice.dto.ReservationAvailabilityDTO;
 import com.scopie.authservice.dto.ReservationDTO;
 import com.scopie.authservice.entity.Reservation;
 
 import javax.naming.CannotProceedException;
+import javax.naming.ServiceUnavailableException;
+import java.util.List;
 import java.util.Optional;
 
 public interface ReservationService {
 
-    void newReservation(ReservationDTO reservationDTO);
-
-    Optional<Reservation> getReservationById(long reservationId);
+    boolean newReservation(ReservationDTO reservationDTO) throws ServiceUnavailableException;
 
     void cancelReservation(long reservationId);
 
@@ -21,4 +22,6 @@ public interface ReservationService {
     boolean checkAvailability(ReservationAvailabilityDTO reservationAvailabilityDTO);
 
     boolean[] getAvailability(ReservationAvailabilityDTO reservationAvailabilityDTO);
+
+    List<MyReservationDTO> getMyReservations(long customerId);
 }

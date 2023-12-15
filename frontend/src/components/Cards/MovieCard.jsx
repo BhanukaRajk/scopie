@@ -28,5 +28,5 @@ export default MovieCard;
 MovieCard.propTypes = {
     movie: PropTypes.object,
     onReservationFormOpen: PropTypes.func,
-    key: PropTypes.any,
+    identity: PropTypes.any,
 };

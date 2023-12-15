@@ -18,7 +18,7 @@ const ForgetPassword = () => {
     return (
         <>
             <div className="h-screen w-screen login-background flex flex-col justify-center items-center">                
-                <ForgotPasswordEmailForm onOpen={onOpen} onClose={onClose} />
+                <ForgotPasswordEmailForm onOpen={onOpen} />
 
 
                 <div className={`${isVerifyForm ? "block" : "block"}`}>

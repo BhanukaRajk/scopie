@@ -2,7 +2,7 @@ import api from "./api";
 
 // GET THE USER'S RESERVATIONS
 export const getReservations = (user) => {
-    return api.get("/reservations/", { params : user })
+    return api.get("/reservations/my-reservations", { params : user })
 }
 
 // CREATE A NEW RESERVATION

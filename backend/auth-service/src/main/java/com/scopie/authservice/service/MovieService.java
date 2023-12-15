@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface MovieService {
-    List<Movie> getMovies(String filter);
+    List<MovieDTO> getMovies(String filter);
     List<MovieDTO> getMovies();
     MovieShowsDTO movieDetails(long movieId);
     void updateMovieList(KafkaMovieDTO movie) throws IOException;

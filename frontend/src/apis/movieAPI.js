@@ -6,8 +6,8 @@ export const getMovies = () => {
 }
 
 // GET MOVIE BY USING FILTERS
-export const getMovie = (filters) => {
-    return api.get("/movies/", { params: filters });
+export const getMovie = (movie) => {
+    return api.get("/movies/", { params: movie });
 }
 
 // GET THE INFO ABOUT LOCATIONS OF MOVIES/CINEMA

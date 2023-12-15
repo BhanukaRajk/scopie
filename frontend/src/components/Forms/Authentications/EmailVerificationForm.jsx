@@ -89,7 +89,7 @@ const EmailVerificationForm = ({ isOpen, onClose }) => {
                                     onChange={handleInputChange}
                                 />
                             </div>
-                            <button type="submit" className=" text-md text-center bg-blue-700 hover:bg-blue-400 text-white hover:text-white py-2 rounded-lg font-semibold cursor-pointer">
+                            <button type="submit" className=" text-md text-center bg-yellow-400 hover:bg-yellow-200 text-black hover:text-black hover:shadow-md border-none py-2 rounded-lg font-semibold cursor-pointer">
                                 Verify
                             </button>
                         </form>

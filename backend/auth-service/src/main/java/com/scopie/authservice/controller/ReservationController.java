@@ -1,9 +1,12 @@
 package com.scopie.authservice.controller;
 
+import com.scopie.authservice.dto.MyReservationDTO;
 import com.scopie.authservice.dto.PaymentDTO;
 import com.scopie.authservice.dto.ReservationAvailabilityDTO;
 import com.scopie.authservice.dto.ReservationDTO;
+import com.scopie.authservice.entity.Customer;
 import com.scopie.authservice.entity.Reservation;
+import com.scopie.authservice.service.AuthService;
 import com.scopie.authservice.service.ReservationService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -29,6 +32,9 @@ public class ReservationController {
 
     @Autowired
     private ReservationService reservationService;
+
+    @Autowired
+    private AuthService authService;
 
     // CREATE NEW RESERVATION FOR A CUSTOMER
     @PostMapping("/new")
@@ -59,12 +65,16 @@ public class ReservationController {
     }
 
     // GET THE RESERVATION DATA WHEN USER REQUESTED BY SELECTING A RESERVATION
-    @GetMapping("/:id")
-    public Optional<Reservation> viewSpecificReservation(@RequestParam long reservationId) throws NotFoundException {
+    @GetMapping("/my-reservations")
+    public ResponseEntity<List<MyReservationDTO>> getMyReservations(@RequestParam String username) {
         try {
-            return reservationService.getReservationById(reservationId);
+            Customer customer = authService.findByUsername(username);
+
+            List<MyReservationDTO> myReservations = reservationService.getMyReservations(customer.getCustomerId());
+
+            return new ResponseEntity<>(myReservations, HttpStatus.OK);
         } catch (Exception e) {
-            throw new NotFoundException("Reservation not found!");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

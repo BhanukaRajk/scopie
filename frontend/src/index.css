@@ -3,7 +3,7 @@
 @import 'tailwindcss/utilities';
 
 :root {
-  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -22,6 +22,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -51,9 +52,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -64,9 +67,11 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
   }
@@ -76,4 +81,24 @@ button:focus-visible {
   background-image: url('../src/assets/cover4.jpg');
   background-size: cover;
   background-position: center;
+}
+
+.ant-drawer-content-wrapper {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.ant-drawer-content-wrapper {
+  overflow: hidden;
+}
+
+.ant-drawer-content {
+  width: 100%;
+}
+
+.ant-drawer-content-wrapper {
+  z-index: 1000;
 }

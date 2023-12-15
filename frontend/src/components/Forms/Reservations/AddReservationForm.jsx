@@ -6,6 +6,7 @@ import { getMovie } from "../../../apis/movieAPI";
 import { message, Select, DatePicker, InputNumber } from "antd";
 import SeatPicker from "./SeatPicker";
 import useUser from "../../../hooks/useUser";
+import moment from 'moment';
 
 const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
     const { user } = useUser();
@@ -18,7 +19,7 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
 
     const [seatAvailability, setSeatAvailability] = useState([]);
     const [movieAvailability, setMovieAvailability] = useState([]);
-    const [seatSelection, setSeatSelection] = useState([]);
+    // const [seatSelection, setSeatSelection] = useState([]);
 
     const [bookingReq, setBookingReq] = useState({
         movieId: null,
@@ -51,15 +52,18 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
         });
 
         const fetchMovie = async () => {
-            try {
-                const response = await getMovie({ movieId: movie.movieId });
-                setMovieAvailability(response.data.movieShows);
-            } catch (error) {
-                console.error("Error fetching movie:", error);
+            if (movie.movieId != null) {
+                try {
+                    const response = await getMovie({ movieId: movie.movieId });
+                    setMovieAvailability(response.data.movieShows);
+                } catch (error) {
+                    console.error("Error fetching movie:", error);
+                }
             }
         };
         fetchMovie();
     }, [movie.movieId]);
+
 
     const onSelectionOpen = () => {
         setSelectionBoxVisible(true);
@@ -69,33 +73,40 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
         setSelectionBoxVisible(false);
     };
 
-    const handleReservation = async () => {
-        // event.preventDefault();
+    const handleReservation = async (Selections) => {
 
         setReservationData({
             ...reservationData,
-            seatSelection: seatSelection,
+            seatSelection: Selections,
         });
 
-        console.log(reservationData); // TODO: REMOVE THIS
-
-        try {
-            const response = await newReservation(reservationData);
-            console.log(response);
+        console.log(reservationData)
+        if (reservationData.seatSelection != null) {
+            try {
+                const response = await newReservation(reservationData);
+                console.log(response);
+                messageApi.open({
+                    type: "success",
+                    content: "Seat reservation success!"
+                }) 
+                onCancel();
+            } catch (error) {
+                console.error("Error making reservation:", error);
+                messageApi.open({
+                    type: "error",
+                    content: "Seat resrvation failed!"
+                })
+            }
+        } else {
             messageApi.open({
-                type: "success",
-                content: "Success!"
-            })
-        } catch (error) {
-            console.error("Error making reservation:", error);
-            messageApi.open({
-                type: "error",
-                content: "Error!"
+                type: "warning",
+                content: "Could not catch the selection!"
             })
         }
     };
 
     const checkAvailability = async (event) => {
+        console.log(bookingReq)
         event.preventDefault();
         if (
             bookingReq.movieId == null ||
@@ -106,21 +117,31 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
             bookingReq.timeSlotId == "" ||
             bookingReq.movieDate == null ||
             bookingReq.movieDate == "" ||
-            bookingReq.seatCount == null ||
-            bookingReq.seatCount == 0
+            bookingReq.seatCount == null
         ) {
             messageApi.open({
                 type: "warning",
                 content: "All the fields must be filled!"
             })
+        } else if (
+            bookingReq.seatCount == 0
+        ) {
+            messageApi.open({
+                type: "warning",
+                content: "Enter atleast one or more seats!"
+            })
+
         } else {
             try {
                 const availability = await checkSeatAvailability(bookingReq);
                 setSeatAvailability(availability.data);
-                console.log(seatAvailability.length); // TODO: REMOVE THIS
+                await messageApi.open({
+                    type: "loading",
+                    content: "Please wait..",
+                });
+                console.log(availability.data)
 
-                if (seatAvailability != null && seatAvailability.length > 0) {
-                    console.log(availability.data); // TODO: REMOVE THIS
+                if (availability.data != null && availability.data.length > 0) {
                     onSelectionOpen();
                     messageApi.open({
                         type: "info",
@@ -140,6 +161,32 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                 });
             }
         }
+    };
+
+    const onCancel = () => {
+        setSelectedCinema(null);
+        setSelectedTimeSlot(null);
+
+        setBookingReq({
+            movieId: null,
+            cinemaId: null,
+            timeSlotId: null,
+            seatCount: null,
+            movieDate: null,
+        });
+
+        setReservationData({
+            userName: user,
+            movieId: null,
+            cinemaId: null,
+            timeSlotId: null,
+            seatSelection: [],
+            movieDate: null,
+        });
+
+        // CLOSE THE SEAT PICKER
+        onSelectionClose();
+        onReservationFormClose();
     };
 
     const filteredCinemas = movieAvailability.map((cinema) => ({
@@ -162,10 +209,9 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                     } flex flex-col justify-center items-center bg-black bg-opacity-70`}
             >
                 <div className="bg-white border text-black border-gray-300 w-full sm:w-96 py-8 flex items-center flex-col rounded-md">
-                    <div className="text-lg font-semibold">How many tickets?</div>
+                    <div className="text-lg font-semibold">How many seats?</div>
                     <form className="mt-8 w-10/12 flex flex-col">
-                        <div className="mb-4">
-                            <span className="font-semibold">Movie: </span>
+                        <div className="mb-4 w-full text-center text-xl italic font-light">
                             {movie != null ? movie.title : "null"}
                         </div>
                         <div className="mb-4">
@@ -174,17 +220,18 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                                     width: "100%",
                                     paddingBlock: "2.75%",
                                 }}
+                                disabledDate={(current) => current && current < moment().startOf('day')}
                                 onChange={(value) => {
                                     setBookingReq({
                                         ...bookingReq,
-                                        movieDate: value.toJSON(),
+                                        movieDate: value ? value.toJSON() : null,
                                     });
                                     setReservationData({
                                         ...reservationData,
-                                        movieDate: value.toJSON(),
+                                        movieDate: value ? value.toJSON() : null,
                                     });
-                                    setSelectedCinema(value);
                                 }}
+                                placeholder="Select Movie date (Required)"
                             />
                         </div>
                         <div className="mb-4">
@@ -192,19 +239,20 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                                 size="large"
                                 min={1}
                                 max={10}
+                                value={bookingReq.seatCount}
                                 onChange={(value) => {
                                     setBookingReq({
                                         ...bookingReq,
                                         seatCount: value,
                                     });
                                 }}
-                                placeholder="No. of seats"
+                                placeholder="Seat count (Required)"
                                 style={{ width: "100%" }}
                             />
                         </div>
                         <div className="mb-4">
                             <Select
-                                placeholder="Select Cinema"
+                                placeholder="Select Cinema (Required)"
                                 value={selectedCinema}
                                 onChange={(value) => {
                                     setBookingReq({
@@ -226,7 +274,7 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                         </div>
                         <div className="mb-4">
                             <Select
-                                placeholder="Select Time"
+                                placeholder="Select Time (Required)"
                                 value={selectedTimeSlot}
                                 onChange={(value) => {
                                     setBookingReq({
@@ -257,7 +305,7 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                             <button
                                 type="reset"
                                 className="text-black bg-none border-none text-sm cursor-pointer"
-                                onClick={onReservationFormClose}
+                                onClick={onCancel}
                             >
                                 Cancel
                             </button>
@@ -267,7 +315,7 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                             seatAvailability={seatAvailability}
                             onSelectionClose={onSelectionClose}
                             handleReservation={handleReservation}
-                            setSeatSelection={setSeatSelection}
+                        // setSeatSelection={setSeatSelection}
                         />
                     </form>
                 </div>
@@ -279,7 +327,7 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
 export default AddReservationForm;
 
 AddReservationForm.propTypes = {
-    movie: PropTypes.object,
+    movie: PropTypes.any,
     onReservationFormClose: PropTypes.func,
     isFormOpen: PropTypes.bool,
 };

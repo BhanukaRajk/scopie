@@ -20,5 +20,6 @@ public interface AuthService {
 
     boolean updatePassword(PasswordChangeDTO updatedPasswords);
 
-    public ProfileUpdateDTO getUserDetails(String username);
+    ProfileUpdateDTO getUserDetails(String username);
+
 }

@@ -22,9 +22,6 @@ public class KafkaServiceImpl implements KafkaService {
     @Autowired
     private SeatRepository seatRepository;
 
-    @Autowired
-    private MovieTimeRepository movieTimeRepository;
-
     public void updateCinema(KafkaCinemaDTO kfkCinemaDTO) throws CannotProceedException {
         try {
             cinemaRepository.save(Cinema.builder()
@@ -48,10 +45,6 @@ public class KafkaServiceImpl implements KafkaService {
         } catch (Exception e) {
             throw new UnknownFormatConversionException("Error while adding new seat! error code: "+ e);
         }
-    }
-
-    public void updateMovieTime(KafkaMovieTimeDTO kafkaMovieTimeDTO) {
-
     }
 
 }

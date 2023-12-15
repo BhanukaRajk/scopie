@@ -55,6 +55,7 @@ const UpdatePasswordForm = ({ onClose, user }) => {
                         type: 'success',
                         content: 'Password changed!!',
                     });
+                    onClose();
                 }
             } catch (error) {
                 console.error(error);

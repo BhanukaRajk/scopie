@@ -12,11 +12,12 @@ import java.util.List;
 @NoArgsConstructor
 public class MyReservationDTO {
     private long customerId;
-    private String movieName;
+    private String title; // MOVIE NAME
+    private String name;// CINEMA NAME
     private long reservationId;
     private Double totalPrice;
-    private Date bookedOn; // DATE WHEN CREATED
-    private List<Long> seatNumbers;
+    private Date date; // DATE WHEN CREATED
+    private List<Long> seatNumbers; // SEAT IDS IN SEAT RESERVATION TABLE
     private Time movieTime;
     private Date movieDate; // DATE WHEN MOVIE SHOWS
 

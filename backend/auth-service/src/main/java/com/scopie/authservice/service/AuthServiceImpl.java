@@ -44,15 +44,6 @@ public class AuthServiceImpl implements AuthService {
 
     // ADDING NEW CUSTOMER
     public void signUp(ValidationDTO validationDTO) {
-//        Customer newCustomer = new Customer(
-//                null,
-//                validationDTO.getFirstName(),
-//                validationDTO.getLastName(),
-//                validationDTO.getEmail(),
-//                passwordEncoder.encode(validationDTO.getPassword()),
-//                null
-//        );
-//        customerRepo.save(newCustomer);
 
         customerRepo.save(Customer.builder()
                 .firstName(validationDTO.getFirstName())

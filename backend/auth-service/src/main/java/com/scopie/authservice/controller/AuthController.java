@@ -85,7 +85,7 @@ public class AuthController {
             try {
                 if (Objects.equals(authService.authenticateUser(credentials.getUsername(), credentials.getPassword()), "false")) {
 //                    return Map.of("error", "Invalid username or password!");
-                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(Map.of("error", "Invalid username or password!"));
+                    return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(Map.of("error", "Invalid username or password!"));
 //                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid username or password!");
                 } else {
 //                    return new JwtGeneratorImpl().generate(credentials);
@@ -138,7 +138,7 @@ public class AuthController {
             emailService.sendEmail(signupReq.getEmail());
             return ResponseEntity.status(HttpStatus.CREATED).body("Verification code sent successfully!");
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Verification code sending failed!");
         }
     }
@@ -185,23 +185,22 @@ public class AuthController {
     // TODO: TRY TO USE THE GET MAPPING FOR OTP CODE REQUEST
     // FORGOT PASSWORD EMAIL VALIDATION + OTP SEND REQUEST (#250)
     @PostMapping("/forgot-password/verify-email")
-    public ResponseEntity<String> verifyEmail(@RequestBody EmailDTO userEmail) {
+    public ResponseEntity<Map<String, String>> verifyEmail(@RequestBody EmailDTO userEmail) {
         if (userEmail != null) {
             boolean userExist = (!Objects.equals(authService.findByUsername(userEmail.getEmail()), null));
             if (userExist) { // CHECK WHETHER THE USERNAME IS EXIST IN THE USERS TABLE
                 try {
                     emailService.sendEmail(userEmail.getEmail());
-                    return ResponseEntity.status(HttpStatus.ACCEPTED).body("Verification code sent!");
+                    return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("success", "Verification code sent!"));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Verification code sending failed!");
-
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Verification code sending failed!"));
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
+                return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(Map.of("error", "User not found!"));
             }
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username cannot be null!");
+            return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(Map.of("error", "Username cannot be null!"));
         }
     }
 
@@ -214,7 +213,7 @@ public class AuthController {
             try {
                 emailService.sendEmail(userEmail.getEmail());
             } catch (Exception e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 throw new RuntimeException("Email sending failed!");
             }
         }
@@ -254,11 +253,17 @@ public class AuthController {
     // CHANGE ACCOUNT SETTINGS
     @PatchMapping("/account/update")
     public ResponseEntity<String> updateAccountName(@RequestBody ProfileUpdateDTO updatedName) {
-        try {
-            authService.updateAccName(updatedName);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Account updated!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while updating account!");
+        if(updatedName.getUserName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account update failed!");
+        } else if (updatedName.getFirstName() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("First name cannot be null!");
+        } else {
+            try {
+                authService.updateAccName(updatedName);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body("Account updated!");
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while updating account!");
+            }
         }
     }
 

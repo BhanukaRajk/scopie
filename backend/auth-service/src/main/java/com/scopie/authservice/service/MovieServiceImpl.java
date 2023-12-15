@@ -45,8 +45,17 @@ public class MovieServiceImpl implements MovieService {
 
 
     // GET MOVIES WHEN FILTER KEY IS AVAILABLE
-    public List<Movie> getMovies(String filter) {
-        return movieRepository.findAllWithFilter(filter);
+    public List<MovieDTO> getMovies(String filter) {
+        List<Movie> movies = movieRepository.findAllWithFilter(filter);
+        return movies.stream()
+                .map(movie -> new MovieDTO(
+                        movie.getMovieId(),
+                        movie.getTitle(),
+                        movie.getBanner(),
+                        movie.getGenre(),
+                        movie.getLanguage(),
+                        movie.getDuration()
+                )).toList();
     }
 
     // GET MOVIES WHEN FILTER KEY IS NOT AVAILABLE
@@ -141,7 +150,7 @@ public class MovieServiceImpl implements MovieService {
                     ShowTimeDTO showTime = ShowTimeDTO.builder()
                             .id(currentCinema)
                             .name(cinema.getName())
-                            .timeSlots(new ArrayList<>(timeSlotRecordsSet)) // Copy the list
+                            .timeSlots(new ArrayList<>(timeSlotRecordsSet)) // COPY THE LIST
                             .build();
                     showTimesSet.add(showTime);
                 }
