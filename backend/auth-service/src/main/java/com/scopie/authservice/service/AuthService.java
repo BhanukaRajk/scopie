@@ -7,7 +7,6 @@ import com.scopie.authservice.entity.Customer;
 
 public interface AuthService {
 
-
     String authenticateUser(String username, String password);
 
     Customer findByUsername(String username);

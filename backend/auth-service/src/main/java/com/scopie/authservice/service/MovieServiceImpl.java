@@ -72,61 +72,6 @@ public class MovieServiceImpl implements MovieService {
                 )).toList();
     }
 
-    // GET THE MOVIE DETAILS WHEN USER CLICK ON SOME MOVIE
-//    public MovieShowsDTO movieDetails(long movieId) {
-//        List<MovieTime> movieTimes = movieTimeRepository.findAllByMovieId(movieId); // ORDERED BY CINEMA ID
-//
-//        long currentCinema = movieTimes.get(0).getCinemaId().getId();
-//
-//        List<TimeSlotDTO> timeSlotRecordsSet = new ArrayList<>();
-//        List<ShowTimeDTO> showTimesSet = new ArrayList<>();
-//
-//        for (int item = 0; item < movieTimes.size(); item++) {
-//            MovieTime thisItem = movieTimes.get(item);
-//
-//            Cinema cinema = thisItem.getCinemaId();
-//            TimeSlot timeSlot = thisItem.getSlotId();
-//
-//            if ( item == 0 || thisItem.getCinemaId().getId() != currentCinema ) {
-//
-//                timeSlotRecordsSet.clear();
-//
-//                long thisItemTimeSlotId = thisItem.getSlotId().getSlotId();
-//                TimeSlotDTO timeSlotRecord = TimeSlotDTO.builder()
-//                        .slotId(thisItemTimeSlotId)
-//                        .startTime(timeSlotRepository.findTimeById(thisItemTimeSlotId))
-//                        .build();
-//                timeSlotRecordsSet.add(timeSlotRecord);
-//
-//                ShowTimeDTO showTime = ShowTimeDTO.builder()
-//                        .id(currentCinema)
-//                        .name(cinema.getName())
-//                        .timeSlots(timeSlotRecordsSet)
-//                        .build();
-//
-//                currentCinema = thisItem.getCinemaId().getId();
-//
-//            } else {
-//
-//                long thisItemTimeSlotId = thisItem.getSlotId().getSlotId();
-//                TimeSlotDTO timeSlotRecord = TimeSlotDTO.builder()
-//                        .slotId(thisItemTimeSlotId)
-//                        .startTime(timeSlotRepository.findTimeById(thisItemTimeSlotId))
-//                        .build();
-//                timeSlotRecordsSet.add(timeSlotRecord);
-//            }
-//
-//        }
-//
-//        MovieShowsDTO movieShows = MovieShowsDTO.builder()
-//                .movieId(movieId)
-//                .title(movieRepository.getMovieByMovieId(movieId).getTitle())
-//                .movieShows()
-//                .build();
-//
-//        return movieShows;
-////        return movieRepository.getMovieByMovieId(movieId);
-//    }
 
     // SEND THE DATA WHEN USER SELECTS MOVIE TO RESERVATION
     public MovieShowsDTO movieDetails(long movieId) {
