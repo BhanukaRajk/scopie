@@ -5,13 +5,15 @@ import com.scopie.authservice.dto.ProfileUpdateDTO;
 import com.scopie.authservice.dto.ValidationDTO;
 import com.scopie.authservice.entity.Customer;
 
+import javax.naming.CannotProceedException;
+
 public interface AuthService {
 
     String authenticateUser(String username, String password);
 
     Customer findByUsername(String username);
 
-    void signUp(ValidationDTO signupDTO);
+    void signUp(ValidationDTO signupDTO) throws CannotProceedException;
 
     void changePassword(String username, String password);
 

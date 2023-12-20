@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface MovieService {
     List<MovieDTO> getMovies(String filter);
-    List<MovieDTO> getMovies();
+    List<MovieDTO> getMovies(boolean recents);
     MovieShowsDTO movieDetails(long movieId);
     void updateMovieList(KafkaMovieDTO movie) throws IOException;
 }

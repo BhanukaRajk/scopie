@@ -20,5 +20,6 @@ public class MyReservationDTO {
     private List<Long> seatNumbers; // SEAT IDS IN SEAT RESERVATION TABLE
     private Time movieTime;
     private Date movieDate; // DATE WHEN MOVIE SHOWS
+    private boolean paid;
 
 }

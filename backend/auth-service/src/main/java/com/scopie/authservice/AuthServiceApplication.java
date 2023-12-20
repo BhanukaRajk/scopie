@@ -19,7 +19,7 @@ public class AuthServiceApplication {
 //	CommandLineRunner commandLineRunner(KafkaTemplate<String, Long> kafkaTemplate) {
 //			long kfkReservation =12231;
 //		return args -> {
-//			kafkaTemplate.send("SeatAdd", kfkReservation);
+//			kafkaTemplate.send("New_Seat_Add_Topic", kfkReservation);
 //		};
 //	}
 

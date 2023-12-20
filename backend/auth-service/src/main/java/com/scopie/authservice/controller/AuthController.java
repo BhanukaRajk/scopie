@@ -1,6 +1,6 @@
 package com.scopie.authservice.controller;
 
-import com.scopie.authservice.config.JwtGeneratorImpl;
+import com.scopie.authservice.component.JwtGenerator;
 import com.scopie.authservice.dto.*;
 
 import com.scopie.authservice.service.AuthService;
@@ -30,16 +30,21 @@ import java.util.Map;
 @RestController
 @AllArgsConstructor
 @NoArgsConstructor
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*")
 @RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
     private AuthService authService;
+
     @Autowired
     private OtpService otpService;
+
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private JwtGenerator jwtGenerator;
 
     private ValidationController validator = new ValidationController();
 
@@ -53,7 +58,7 @@ public class AuthController {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid username or password!"));
                 } else {
                     // GENERATE JWT TOKEN
-                    String jwtToken = new JwtGeneratorImpl().generate(credentials).toString();
+                    String jwtToken = jwtGenerator.generateToken(credentials);
 
                     // CREATE AN HTTP ONLY COOKIE WITH THE JWT TOKEN
                     HttpCookie cookie = ResponseCookie.from("jwt-token", jwtToken)
@@ -84,22 +89,15 @@ public class AuthController {
         if (validator.emailValidator(credentials.getUsername())) {
             try {
                 if (Objects.equals(authService.authenticateUser(credentials.getUsername(), credentials.getPassword()), "false")) {
-//                    return Map.of("error", "Invalid username or password!");
                     return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(Map.of("error", "Invalid username or password!"));
-//                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid username or password!");
                 } else {
-//                    return new JwtGeneratorImpl().generate(credentials);
-                    return ResponseEntity.status(HttpStatus.CREATED).body(new JwtGeneratorImpl().generate(credentials));
+                    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("token", jwtGenerator.generateToken(credentials)));
                 }
             } catch (Exception e) {
-//                return Map.of("error", e.getMessage());
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
-//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
             }
         } else {
-//            return Map.of("error", "Please enter xxx@xxx.xx format!");
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(Map.of("error", "Please enter xxx@xxx.xx format!"));
-//            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Please enter xxx@xxx.xx format!");
+            return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(Map.of("error", "Please enter valid email format!"));
         }
 
     }
@@ -138,7 +136,6 @@ public class AuthController {
             emailService.sendEmail(signupReq.getEmail());
             return ResponseEntity.status(HttpStatus.CREATED).body("Verification code sent successfully!");
         } catch (Exception e) {
-//            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Verification code sending failed!");
         }
     }
@@ -177,12 +174,11 @@ public class AuthController {
         } catch (DuplicateKeyException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email address already exists!");
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Customer adding failed!");
         }
     }
 
-    // TODO: TRY TO USE THE GET MAPPING FOR OTP CODE REQUEST
+
     // FORGOT PASSWORD EMAIL VALIDATION + OTP SEND REQUEST (#250)
     @PostMapping("/forgot-password/verify-email")
     public ResponseEntity<Map<String, String>> verifyEmail(@RequestBody EmailDTO userEmail) {
@@ -193,7 +189,6 @@ public class AuthController {
                     emailService.sendEmail(userEmail.getEmail());
                     return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("success", "Verification code sent!"));
                 } catch (Exception e) {
-                    e.printStackTrace();
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Verification code sending failed!"));
                 }
             } else {
@@ -204,7 +199,7 @@ public class AuthController {
         }
     }
 
-    // TODO: TRY TO USE THE PARAMETERS INSTEAD OF BODY (USE GET MAPPING)
+
     // ENTER EMAIL TO GET THE VERIFICATION CODE FOR CHANGE PASSWORD (#001)
     @PostMapping("/forgot-password/resend-one-time-passcode")
     public void resendCode(@NonNull @RequestBody EmailDTO userEmail) {
@@ -213,7 +208,6 @@ public class AuthController {
             try {
                 emailService.sendEmail(userEmail.getEmail());
             } catch (Exception e) {
-//                e.printStackTrace();
                 throw new RuntimeException("Email sending failed!");
             }
         }
@@ -252,47 +246,59 @@ public class AuthController {
 
     // CHANGE ACCOUNT SETTINGS
     @PatchMapping("/account/update")
-    public ResponseEntity<String> updateAccountName(@RequestBody ProfileUpdateDTO updatedName) {
-        if(updatedName.getUserName() == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account update failed!");
-        } else if (updatedName.getFirstName() == null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("First name cannot be null!");
-        } else {
-            try {
-                authService.updateAccName(updatedName);
-                return ResponseEntity.status(HttpStatus.ACCEPTED).body("Account updated!");
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while updating account!");
+    public ResponseEntity<String> updateAccountName(@RequestBody ProfileUpdateDTO updatedName, @RequestHeader(name = "Authorization", required = true) String authorizationHeader) {
+        if((jwtGenerator.validateToken(authorizationHeader.split(" ")[1]))) {
+            if(updatedName.getUserName() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account update failed!");
+            } else if (updatedName.getFirstName() == null) {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("First name cannot be null!");
+            } else {
+                try {
+                    authService.updateAccName(updatedName);
+                    return ResponseEntity.status(HttpStatus.ACCEPTED).body("Account updated!");
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while updating account!");
+                }
             }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
 
     // GET ACCOUNT DETAILS FOR UPDATE
     @GetMapping("/account/update/")
-    public ResponseEntity<ProfileUpdateDTO> getProfileData(@RequestParam EmailDTO userName) {
-        try {
-            ProfileUpdateDTO currentUser = authService.getUserDetails(userName.getEmail());
-            return ResponseEntity.status(HttpStatus.OK).body(currentUser);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    public ResponseEntity<ProfileUpdateDTO> getProfileData(@RequestParam EmailDTO userName, @RequestHeader(name = "Authorization", required = true) String authorizationHeader) {
+        if((jwtGenerator.validateToken(authorizationHeader.split(" ")[1]))) {
+            try {
+                ProfileUpdateDTO currentUser = authService.getUserDetails(userName.getEmail());
+                return ResponseEntity.status(HttpStatus.OK).body(currentUser);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
 
     // ACCOUNT PASSWORD CHANGE FROM INSIDE
     @PatchMapping("/account/change-password")
-    public ResponseEntity<Map<String, String>> updatePassword(@RequestBody PasswordChangeDTO updatedPasswords) {
-        if (Objects.equals(updatedPasswords.getNewPassword(), updatedPasswords.getConfPassword())) {
-            try {
-                if (authService.updatePassword(updatedPasswords)) {
-                    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("success","Password updated!"));
-                } else {
-                    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("error", "Invalid current password!"));
+    public ResponseEntity<Map<String, String>> updatePassword(@RequestBody PasswordChangeDTO updatedPasswords, @RequestHeader(name = "Authorization", required = true) String authorizationHeader) {
+        if((jwtGenerator.validateToken(authorizationHeader.split(" ")[1]))) {
+            if (Objects.equals(updatedPasswords.getNewPassword(), updatedPasswords.getConfPassword())) {
+                try {
+                    if (authService.updatePassword(updatedPasswords)) {
+                        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("success","Password updated!"));
+                    } else {
+                        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("error", "Invalid current password!"));
+                    }
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Password updating process failed!"));
                 }
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Password updating process failed!"));
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("error", "Password does not match!"));
             }
         } else {
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("error", "Password does not match!"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Unauthorized request!"));
         }
     }
 

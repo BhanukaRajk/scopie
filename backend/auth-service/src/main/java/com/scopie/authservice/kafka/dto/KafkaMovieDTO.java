@@ -11,7 +11,7 @@ import java.sql.Time;
 public class KafkaMovieDTO {
     private long  movieId;
     private String title;
-    private MultipartFile banner;
+    private String banner;
     private String genre;
     private String language;
     private Time duration;

@@ -10,16 +10,21 @@ import com.scopie.authservice.kafka.dto.KafkaReservedSeatDTO;
 import com.scopie.authservice.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.management.RuntimeErrorException;
 import javax.naming.CannotProceedException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import javax.naming.ServiceUnavailableException;
+import java.sql.Time;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.util.ObjectUtils.isEmpty;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -46,6 +51,9 @@ public class ReservationServiceImpl implements ReservationService {
     private PaymentRepository paymentRepository;
 
     @Autowired
+    private TimeSlotRepository timeSlotRepository;
+
+    @Autowired
     KafkaTemplate<String, Long> kafkaCancellationTemplate;
 
     @Autowired
@@ -70,7 +78,7 @@ public class ReservationServiceImpl implements ReservationService {
             Reservation savedReservation = reservationRepository.save(Reservation.builder()
                     .customerId(customerRepository.findByEmail(reservationDTO.getUserName()))
                     .date(reservationDTO.getMovieDate())
-                    .totalPrice(reservationDTO.getSeatSelection().size() * 500.00)
+                    .totalPrice(priceCalculator(reservationDTO.getSeatSelection().size(), 500.00)) // DEFAULT PRICE OF THE TICKET
                     .build()
             );
             KafkaReservationDTO kfkReservation = new KafkaReservationDTO(
@@ -78,7 +86,7 @@ public class ReservationServiceImpl implements ReservationService {
                     savedReservation.getDate(),
                     savedReservation.getTotalPrice()
             );
-            kafkaReservationTemplate.send("NewReservations", kfkReservation);
+            kafkaReservationTemplate.send("New_Reservation_Topic", kfkReservation);
 
             // SET SEATS
             for (Long seat : reservationDTO.getSeatSelection()) {
@@ -101,9 +109,8 @@ public class ReservationServiceImpl implements ReservationService {
                         reservedSeat.getReservationId().getReservationId(),
                         reservedSeat.getMovieDate()
                 );
-                kafkaReservedSeatTemplate.send("NewSeatReserve", kfkReservedSeat);
+                kafkaReservedSeatTemplate.send("New_Reserved_Seat_Topic", kfkReservedSeat);
             }
-
             return true;
 
         } catch (Exception e) {
@@ -111,86 +118,125 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
-    public boolean checkAvailability(ReservationAvailabilityDTO reservationAvailabilityDTO) {
-        MovieTime movieTime = movieTimeRepository.findByCinemaMovieTimeslot(
-                reservationAvailabilityDTO.getCinemaId(),
-                reservationAvailabilityDTO.getMovieId(),
-                reservationAvailabilityDTO.getTimeSlotId()
-        );
+    public boolean checkAvailability(ReservationAvailabilityDTO reservationAvailabilityDTO) throws CannotProceedException {
+        try {
+            MovieTime movieTime = movieTimeRepository.findByCinemaMovieTimeslot(
+                    reservationAvailabilityDTO.getCinemaId(),
+                    reservationAvailabilityDTO.getMovieId(),
+                    reservationAvailabilityDTO.getTimeSlotId()
+            );
 
-        List<ReservedSeat> reservedSeats = reservedSeatRepository.findByMovieTimeAndDate(
-                movieTime.getMovieTimeId(),
-                reservationAvailabilityDTO.getMovieDate()
-        );
+            List<ReservedSeat> reservedSeats = reservedSeatRepository.findByMovieTimeAndDate(
+                    movieTime.getMovieTimeId(),
+                    reservationAvailabilityDTO.getMovieDate()
+            );
 
-        int totalReservedSeatsCount = reservedSeats.size();
-        int requestedSeatCount = reservationAvailabilityDTO.getSeatCount();
+            int totalReservedSeatsCount = reservedSeats.size();
+            int requestedSeatCount = reservationAvailabilityDTO.getSeatCount();
 
-        System.out.println(totalReservedSeatsCount);
+            if (requestedSeatCount <= (movieTime.getSeatCount() - totalReservedSeatsCount)) {
+                return true;
+            } else {
+                return false;
+            }
 
-        if (requestedSeatCount <= (Integer.parseInt(movieTime.getSeatCount()) - totalReservedSeatsCount)) {
-            return true;
-        } else {
-            return false;
+        } catch (Exception e) {
+            throw new CannotProceedException("Could not get seat availability data!");
         }
     }
 
     public boolean[] getAvailability(ReservationAvailabilityDTO reservationAvailabilityDTO) {
-        MovieTime movieTime = movieTimeRepository.findByCinemaMovieTimeslot(
-                reservationAvailabilityDTO.getCinemaId(),
-                reservationAvailabilityDTO.getMovieId(),
-                reservationAvailabilityDTO.getTimeSlotId()
-        );
+        try {
+            MovieTime movieTime = movieTimeRepository.findByCinemaMovieTimeslot(
+                    reservationAvailabilityDTO.getCinemaId(),
+                    reservationAvailabilityDTO.getMovieId(),
+                    reservationAvailabilityDTO.getTimeSlotId()
+            );
 
-        List<ReservedSeat> reservedSeats = reservedSeatRepository.findByMovieTimeAndDate(
-                movieTime.getMovieTimeId(),
-                reservationAvailabilityDTO.getMovieDate()
-        );
+            List<ReservedSeat> reservedSeats = reservedSeatRepository.findByMovieTimeAndDate(
+                    movieTime.getMovieTimeId(),
+                    reservationAvailabilityDTO.getMovieDate()
+            );
 
-        int totalSeatCount = Integer.parseInt(movieTime.getSeatCount());
+            int totalSeatCount = movieTime.getSeatCount();
+            boolean[] seatAvailability = new boolean[totalSeatCount];
+            Arrays.fill(seatAvailability, true);
 
-        boolean[] seatAvailability = new boolean[totalSeatCount];
-        Arrays.fill(seatAvailability, true);
-
-        for (ReservedSeat reservedSeat : reservedSeats) {
-            int seatIndex = (int) reservedSeat.getSeatId().getSeatId() - 1;
-            if (seatIndex >= 0 && seatIndex < totalSeatCount) {
-                seatAvailability[seatIndex] = false;
+            for (ReservedSeat reservedSeat : reservedSeats) {
+                int seatIndex = (int) reservedSeat.getSeatId().getSeatId() - 1;
+                if (seatIndex >= 0 && seatIndex < totalSeatCount) {
+                    seatAvailability[seatIndex] = false;
+                }
             }
+            return seatAvailability;
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Could not get the available seat list!");
         }
-
-        return seatAvailability;
     }
 
-    public List<MyReservationDTO> getMyReservations(long customerId) {
+    public boolean acceptSeats(ReservationDTO reservationDTO) {
+        try {
+            List<Long> seatNumbers = reservationDTO.getSeatSelection();
 
-        List<MyReservationDTO> myReservations = new ArrayList<>();
-        List<Reservation> reservations = reservationRepository.findByCustomerId(customerId);
-        System.out.println(reservations.size());
-
-        // CONVERT RESERVATION ENTITIES TO MY RESERVATION DTO
-        for (Reservation reservation : reservations) {
-            System.out.println("HI line 170");
-            MyReservationDTO myReservationDTO = MyReservationDTO.builder()
-                    .customerId(reservation.getCustomerId().getCustomerId())
-                    .title(reservation.getReservedSeats().get(0).getMovieTimeId().getMovieId().getTitle())
-                    .name(reservation.getReservedSeats().get(0).getMovieTimeId().getCinemaId().getName())
-                    .reservationId(reservation.getReservationId())
-                    .totalPrice(reservation.getTotalPrice())
-                    .date(reservation.getDate())
-                    .seatNumbers(getSeatNumbers(reservation.getReservedSeats()))
-                    .movieTime(reservation.getReservedSeats().get(0).getMovieTimeId().getSlotId().getStartTime())
-                    .movieDate(reservation.getReservedSeats().get(0).getMovieDate())
+            ReservationAvailabilityDTO reservationAvailabilityDTO = ReservationAvailabilityDTO.builder()
+                    .movieId(reservationDTO.getMovieId())
+                    .cinemaId(reservationDTO.getCinemaId())
+                    .timeSlotId(reservationDTO.getTimeSlotId())
+                    .seatCount(seatNumbers.size())
+                    .movieDate(reservationDTO.getMovieDate())
                     .build();
-            myReservations.add(myReservationDTO);
-        }
 
-        return myReservations;
+            boolean[] seatAvailability = getAvailability(reservationAvailabilityDTO);
+
+            for (Long seatNumber : seatNumbers) {
+                int seatIndex = Math.toIntExact(seatNumber);
+                if (!seatAvailability[seatIndex - 1]) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Could not detect currently reserved seats!");
+        }
+    }
+
+    public List<MyReservationDTO> getMyReservations(long customerId, boolean upcoming) {
+        try {
+            List<MyReservationDTO> myReservations = new ArrayList<>();
+            List<Reservation> reservations = reservationRepository.findByCustomerId(customerId);
+            Date currentDate = new Date();
+
+            // CONVERT RESERVATION ENTITIES TO MY RESERVATION DTO
+            for (Reservation reservation : reservations) {
+                MyReservationDTO myReservationDTO = MyReservationDTO.builder()
+                        .customerId(reservation.getCustomerId().getCustomerId())
+                        .title(reservation.getReservedSeats().get(0).getMovieTimeId().getMovieId().getTitle())
+                        .name(reservation.getReservedSeats().get(0).getMovieTimeId().getCinemaId().getName())
+                        .reservationId(reservation.getReservationId())
+                        .totalPrice(reservation.getTotalPrice())
+                        .date(reservation.getDate())
+                        .seatNumbers(getSeatNumbers(reservation.getReservedSeats()))
+                        .movieTime(reservation.getReservedSeats().get(0).getMovieTimeId().getSlotId().getStartTime())
+                        .movieDate(reservation.getReservedSeats().get(0).getMovieDate())
+                        .paid(!isEmpty(reservation.getPayment()))
+                        .build();
+
+                if(myReservationDTO.getMovieDate().after(currentDate) || !upcoming) { // CHECK THE DATE IS PASSED
+                    myReservations.add(myReservationDTO);
+                }
+            }
+            return myReservations;
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Could not get your reservation data!");
+        }
     }
 
     private List<Long> getSeatNumbers(List<ReservedSeat> reservedSeats) {
-        System.out.println("HI IM HERE");
         return reservedSeats.stream().map(ReservedSeat::getSeatId).map(Seat::getSeatId).collect(Collectors.toList());
+    }
+
+    public Time getRequestedTime(long timeSlotId) {
+        return timeSlotRepository.findTimeById(timeSlotId);
     }
 
 

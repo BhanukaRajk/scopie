@@ -3,6 +3,8 @@ package com.scopie.authservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Builder
@@ -30,8 +32,6 @@ public class Customer {
     @Column(name = "password", nullable = false)
     private String password;
 
-
     @OneToMany(mappedBy = "customerId", fetch = FetchType.LAZY) // USE THE ATTRIBUTE NAME (NOT THE COLUMN NAME)
     private List<Reservation> reservations;
-
 }

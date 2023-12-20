@@ -35,7 +35,7 @@ public class KafkaListeners {
     }
 
 
-    @KafkaListener( topics = "SeatAdd")
+    @KafkaListener( topics = "New_Seat_Add_Topic")
     public void seatUpdater(String payload) {
         System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
         try {
@@ -50,7 +50,7 @@ public class KafkaListeners {
         }
     }
 
-    @KafkaListener( topics = "MovieTimeAdd")
+    @KafkaListener( topics = "New_Movie_Time_Topic")
     public void movieTimeUpdater(String payload) {
         System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
         try {
@@ -58,7 +58,7 @@ public class KafkaListeners {
             KafkaMovieTimeDTO kfkMovieTimeDTO = objectMapper.readValue(payload, KafkaMovieTimeDTO.class);
 
             // UPDATE THE CINEMA DATA
-//            kafkaService.updateCinema(kfkMovieTimeDTO); // TODO: UPDATE MOVIE TIME
+            kafkaService.updateMovieTime(kfkMovieTimeDTO); // TODO: UPDATE MOVIE TIME
             System.out.println("Deserialized CinemaDTO: " + kfkMovieTimeDTO); // TODO: REMOVE THIS
         } catch (Exception e) {
             System.out.println("Error deserializing CinemaDTO: " + e.getMessage()); // TODO: REMOVE THIS
@@ -66,7 +66,7 @@ public class KafkaListeners {
     }
 
     // LISTENER TO LISTEN WHEN ANY MOVIE IS ADDED OR UPDATED
-    @KafkaListener( topics = "CinemaAdd", groupId = "groupId" )
+    @KafkaListener( topics = "New_Cinema_Topic", groupId = "groupId" )
     public void updateCinema(String payload) {
         System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
         try {
@@ -81,7 +81,7 @@ public class KafkaListeners {
         }
     }
 
-    @KafkaListener(topics = "MovieAdd", groupId = "groupId")
+    @KafkaListener(topics = "New_Movie_Topic", groupId = "groupId")
     public void updateMovie(String payload) {
         System.out.println("Received raw payload: " + payload); // TODO: REMOVE THIS
         try {

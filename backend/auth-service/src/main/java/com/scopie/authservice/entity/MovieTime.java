@@ -34,7 +34,7 @@ public class MovieTime {
     private TimeSlot slotId;
 
     @Column(name = "seat_count", nullable = false)
-    private String seatCount;
+    private int seatCount;
 
 
     @OneToMany(mappedBy = "movieTimeId", fetch = FetchType.LAZY)

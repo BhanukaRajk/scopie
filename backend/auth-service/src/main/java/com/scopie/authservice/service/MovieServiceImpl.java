@@ -13,6 +13,7 @@ import com.scopie.authservice.repository.MovieRepository;
 import com.scopie.authservice.repository.MovieTimeRepository;
 import com.scopie.authservice.repository.TimeSlotRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.NotReadablePropertyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,11 +38,9 @@ public class MovieServiceImpl implements MovieService {
     @Autowired
     private TimeSlotRepository timeSlotRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
 
-    @Value("${upload.path}")
-    private String FILE_PATH;
+//    @Value("${upload.path}")
+//    private String FILE_PATH;
 
 
     // GET MOVIES WHEN FILTER KEY IS AVAILABLE
@@ -59,8 +58,16 @@ public class MovieServiceImpl implements MovieService {
     }
 
     // GET MOVIES WHEN FILTER KEY IS NOT AVAILABLE
-    public List<MovieDTO> getMovies() {
-        List<Movie> movies = movieRepository.findAll();
+    public List<MovieDTO> getMovies(boolean recents) {
+
+        List<Movie> movies;
+
+        if (recents) {
+            movies = movieRepository.getRecentTenRecords();
+        } else {
+            movies = movieRepository.findAll();
+        }
+
         return movies.stream()
                 .map(movie -> new MovieDTO(
                         movie.getMovieId(),
@@ -131,37 +138,58 @@ public class MovieServiceImpl implements MovieService {
                 .build();
     }
 
-
     // ADD OR UPDATE MOVIES WHEN KAFKA MESSAGE RECEIVED
     public void updateMovieList(KafkaMovieDTO movieReq) throws IOException {
 
         try {
-            MultipartFile image = movieReq.getBanner();    // GET THE FILE FROM DTO
-
-            // GET THE ORIGINAL FILE NAME
-            String originalImageName = image.getOriginalFilename();
-            assert originalImageName != null;
-
-            // GENERATE UNIQUE FILE NAME USING UUID
-            String fileExtension = originalImageName.substring(originalImageName.lastIndexOf("."));
-            String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
-
-            // SAVE THE FILE IN UPLOADS FOLDER
-            String filePath = Paths.get(FILE_PATH, uniqueFilename).toString();
-            Files.copy(image.getInputStream(), Paths.get(FILE_PATH).resolve(uniqueFilename));
-
             // SAVE OR UPDATE THE RECORD
             movieRepository.save(Movie.builder()
                     .movieId(movieReq.getMovieId())
                     .title(movieReq.getTitle())
-                    .banner(filePath)
+                    .banner(movieReq.getBanner())
                     .duration(movieReq.getDuration())
                     .genre(movieReq.getGenre())
                     .language(movieReq.getLanguage())
                     .build()
             );
-        } catch (IOException e) {
+        } catch (NotReadablePropertyException e) {
             e.printStackTrace();
         }
     }
+
+
+    // ADD OR UPDATE MOVIES WHEN KAFKA MESSAGE RECEIVED
+//    public void updateMovieList(KafkaMovieDTO movieReq) throws IOException {
+//
+//        try {
+//            MultipartFile image = movieReq.getBanner();    // GET THE FILE FROM DTO
+//
+//            // GET THE ORIGINAL FILE NAME
+//            String originalImageName = image.getOriginalFilename();
+//            assert originalImageName != null;
+//
+//            // GENERATE UNIQUE FILE NAME USING UUID
+//            String fileExtension = originalImageName.substring(originalImageName.lastIndexOf("."));
+//            String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
+//
+//            // SAVE THE FILE IN UPLOADS FOLDER
+//            String filePath = Paths.get(FILE_PATH, uniqueFilename).toString();
+//            Files.copy(image.getInputStream(), Paths.get(FILE_PATH).resolve(uniqueFilename));
+//
+//            // SAVE OR UPDATE THE RECORD
+//            movieRepository.save(Movie.builder()
+//                    .movieId(movieReq.getMovieId())
+//                    .title(movieReq.getTitle())
+//                    .banner(filePath)
+//                    .duration(movieReq.getDuration())
+//                    .genre(movieReq.getGenre())
+//                    .language(movieReq.getLanguage())
+//                    .build()
+//            );
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+
 }

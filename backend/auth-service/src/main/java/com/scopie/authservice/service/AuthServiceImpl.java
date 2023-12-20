@@ -6,9 +6,12 @@ import com.scopie.authservice.dto.ValidationDTO;
 import com.scopie.authservice.entity.Customer;
 import com.scopie.authservice.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.naming.CannotProceedException;
 
 
 @Service
@@ -43,17 +46,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     // ADDING NEW CUSTOMER
-    public void signUp(ValidationDTO validationDTO) {
-
-        customerRepo.save(Customer.builder()
-                .firstName(validationDTO.getFirstName())
-                .lastName(validationDTO.getLastName())
-                .email(validationDTO.getEmail())
-                .password(passwordEncoder.encode(validationDTO.getPassword()))
-                .build()
-        );
+    public void signUp(ValidationDTO validationDTO) throws CannotProceedException {
+        try {
+            customerRepo.save(Customer.builder()
+                    .firstName(validationDTO.getFirstName())
+                    .lastName(validationDTO.getLastName())
+                    .email(validationDTO.getEmail())
+                    .password(passwordEncoder.encode(validationDTO.getPassword()))
+                    .build()
+            );
+        } catch (Exception e) {
+            throw new CannotProceedException("Could not create user account");
+        }
     }
 
+    // FORGOT PASSWORD PASSWORD CHANGER
     public void changePassword(String username, String new_password) {
         try {
             Customer customer = customerRepo.findByEmail(username);
@@ -65,6 +72,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    // UPDATE USER'S NAMES
     public void updateAccName(ProfileUpdateDTO updatedName) {
         try {
             customerRepo.updateNamesByEmail(
@@ -78,31 +86,41 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    // UPDATE USER PASSWORD
     public boolean updatePassword(PasswordChangeDTO updatedPasswords) {
         Customer customer = customerRepo.findByEmail(updatedPasswords.getUserName());
 
-        // CHECK IF USER IS NULL
-        if (customer != null) {
-            // VALIDATE PASSWORD
-            if (passwordEncoder.matches(updatedPasswords.getOldPassword(), customer.getPassword())) {
-                customer.setPassword(passwordEncoder.encode(updatedPasswords.getNewPassword()));
-                customerRepo.save(customer);
-                return true;
+        try {
+            // CHECK IF USER IS NULL
+            if (customer != null) {
+                // VALIDATE PASSWORD
+                if (passwordEncoder.matches(updatedPasswords.getOldPassword(), customer.getPassword())) {
+                    customer.setPassword(passwordEncoder.encode(updatedPasswords.getNewPassword()));
+                    customerRepo.save(customer);
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }
-        } else {
-            return false;
+        } catch (Exception e) {
+            throw new NotFoundException("User not found!");
         }
     }
 
+    // GET CURRENT USER'S DETAILS
     public ProfileUpdateDTO getUserDetails(String username) {
-        Customer customer = customerRepo.findByEmail(username);
-        return new ProfileUpdateDTO(
-                customer.getEmail(),
-                customer.getFirstName(),
-                customer.getLastName()
-        );
+        try {
+            Customer customer = customerRepo.findByEmail(username);
+            return new ProfileUpdateDTO(
+                    customer.getEmail(),
+                    customer.getFirstName(),
+                    customer.getLastName()
+            );
+        } catch (Exception e) {
+            throw new NotFoundException("User not found!");
+        }
     }
 
 }

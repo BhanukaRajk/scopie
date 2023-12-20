@@ -20,13 +20,6 @@ public class KafkaProducer {
     @Value("${spring.kafka.bootstrap-servers}") // KAFKA SERVER PATH
     private String bootstrapServers;
 
-//    public Map<String, Object> producerConfig() {
-//        Map<String, Object> props = new HashMap<>();
-//        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-//        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-//        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-//        return props;
-//    }
 
     public Map<String, Object> producerConfig() {
         Map<String, Object> props = new HashMap<>();

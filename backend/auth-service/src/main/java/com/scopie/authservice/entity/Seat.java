@@ -17,6 +17,7 @@ import java.util.List;
 public class Seat {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "seat_id")
     private long seatId;
 
