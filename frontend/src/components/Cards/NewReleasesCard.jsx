@@ -11,7 +11,7 @@ const NewReleasesCard = ({ movie }) => {
                     <img className="rounded-md" style={{ width: '14rem', height: '18rem', objectFit: 'fill' }} src={movie.banner != null ? movie.banner : NoImage} alt={movie.title} />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <div className="w-full text-xl font-semibold text-center text-black">{movie.title}</div>
+                    <div className="w-full text-xl font-semibold text-center text-black" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxHeight: '2em' }}>{movie.title}</div>
                 </div>
             </div>
         </>

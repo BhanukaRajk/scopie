@@ -18,11 +18,6 @@ export const signUp = (data) => {
     return api.post('/auth/signup-verification', data);
 }
 
-// TO RUN WHEN USER REQUESTS TO RESEND THE OTP CODE - DO NOT REFRESH THE PAGE
-// export const resendCode = (data) => {
-//     return api.post('/auth/forgot-password/resend-one-time-passcode', data);
-// }
-
 // TO RUN WHEN USER REQUESTS TO RESEND THE OTP CODE - DO NOT REFRESH THE PAGE - GET REQUSET USING PARAMETERS
 export const resendCode = (email) => {
     return api.get('/auth/forgot-password/resend-one-time-passcode', {

@@ -34,6 +34,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background-color: #f0f0f0;
+  font-family: 'Poppins', sans-serif;
 }
 
 h1 {
@@ -78,7 +79,7 @@ button:focus-visible {
 }
 
 .login-background {
-  background-image: url('../src/assets/cover4.jpg');
+  background-image: url('../src/assets/Banner.jpg');
   background-size: cover;
   background-position: center;
 }

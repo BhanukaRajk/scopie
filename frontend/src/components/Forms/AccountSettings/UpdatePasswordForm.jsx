@@ -1,12 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
 import { message } from "antd";
-
 import { updatePassword } from "../../../apis/profileAPI";
 
-const UpdatePasswordForm = ({ onClose, user }) => {
+const UpdatePasswordForm = ({ closePasswordForm, user }) => {
 
     const [passwords, setPasswords] = useState({
         userName: user,
@@ -14,7 +12,6 @@ const UpdatePasswordForm = ({ onClose, user }) => {
         newPassword: "",
         confPassword: ""
     });
-
     const [messageApi, contextHolder] = message.useMessage();
 
     const handlePasswordInputChange = (e) => {
@@ -55,7 +52,7 @@ const UpdatePasswordForm = ({ onClose, user }) => {
                         type: 'success',
                         content: 'Password changed!!',
                     });
-                    onClose();
+                    closePasswordForm();
                 }
             } catch (error) {
                 console.error(error);
@@ -114,7 +111,7 @@ const UpdatePasswordForm = ({ onClose, user }) => {
                         <button type="button" onClick={handleChangePassword} className=" text-md text-center bg-yellow-400 hover:bg-yellow-200 border-none text-black hover:text-black py-2 rounded-lg font-semibold cursor-pointer">
                             Change Password
                         </button>
-                        <button onClick={onClose} type="reset" className="text-sm text-center text-black hover:text-yellow-600 font-semibold mt-4 cursor-pointer bg-transparent border-none">Cancel</button>
+                        <button onClick={closePasswordForm} type="reset" className="text-sm text-center text-black hover:text-yellow-600 font-semibold mt-4 cursor-pointer bg-transparent border-none">Cancel</button>
 
                     </form>
                 </div>
@@ -127,5 +124,5 @@ export default UpdatePasswordForm;
 
 UpdatePasswordForm.propTypes = {
     user: PropTypes.string.isRequired,
-    onClose: PropTypes.func.isRequired
+    closePasswordForm: PropTypes.func.isRequired
 }

@@ -52,23 +52,20 @@ const LoginForm = () => {
         } else {
             try {
                 const response = await login(credentials);
-                if (response.data.error != null) {
+                if (response.data.token != null) {
 
+                    sessionStorage.setItem("token", response.data.token);
+                    messageApi.open({
+                        type: 'success',
+                        content: "Login successful!"
+                    })
+                    setUserContext(credentials.username);
+                    
+                } else {
                     messageApi.open({
                         type: 'error',
                         content: response.data.error
                     })
-
-                } else {
-                    sessionStorage.setItem("token", response.data.token);
-                    setUserContext(credentials.username);
-
-                    await messageApi.open({
-                        type: 'success',
-                        content: "Login successful!"
-                    })
-                    navigate("/");
-
                 }
             } catch (error) {
                 messageApi.open({

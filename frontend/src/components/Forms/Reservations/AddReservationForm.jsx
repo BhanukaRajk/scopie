@@ -19,7 +19,6 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
 
     const [seatAvailability, setSeatAvailability] = useState([]);
     const [movieAvailability, setMovieAvailability] = useState([]);
-    // const [seatSelection, setSeatSelection] = useState([]);
 
     const [bookingReq, setBookingReq] = useState({
         movieId: null,
@@ -62,34 +61,35 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
             }
         };
         fetchMovie();
-    }, [movie.movieId]);
+    }, [movie]);
 
+    useEffect(() => {
+        if (reservationData.seatSelection.length > 0) {
+            handleReservation();
+        }
+    }, [reservationData.seatSelection]);
 
-    const onSelectionOpen = () => {
-        setSelectionBoxVisible(true);
+    const seatPickerVisible = (state) => {
+        setSelectionBoxVisible(state);
     };
 
-    const onSelectionClose = () => {
-        setSelectionBoxVisible(false);
-    };
-
-    const handleReservation = async (Selections) => {
-
+    const handleSeatSelection = (seatSelection) => {
         setReservationData({
             ...reservationData,
-            seatSelection: Selections,
-        });
+            seatSelection: seatSelection,
+        })
+    }
 
-        console.log(reservationData)
+    const handleReservation = async () => {
+        // event.preventDefault();
         if (reservationData.seatSelection != null) {
             try {
-                const response = await newReservation(reservationData);
-                console.log(response);
+                await newReservation(reservationData);
                 messageApi.open({
                     type: "success",
                     content: "Seat reservation success!"
-                }) 
-                onCancel();
+                })
+                onCancel(); // CLEAR ALL THE FIELDS AND CLOSE THE FORM
             } catch (error) {
                 console.error("Error making reservation:", error);
                 messageApi.open({
@@ -106,11 +106,8 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
     };
 
     const checkAvailability = async (event) => {
-        console.log(bookingReq)
         event.preventDefault();
         if (
-            bookingReq.movieId == null ||
-            bookingReq.movieId == "" ||
             bookingReq.cinemaId == null ||
             bookingReq.cinemaId == "" ||
             bookingReq.timeSlotId == null ||
@@ -122,6 +119,13 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
             messageApi.open({
                 type: "warning",
                 content: "All the fields must be filled!"
+            })
+        } else if (
+            bookingReq.movieId == null ||
+            bookingReq.movieId == "") {
+            messageApi.open({
+                type: "error",
+                content: "Please refresh the page and try again!"
             })
         } else if (
             bookingReq.seatCount == 0
@@ -139,10 +143,9 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                     type: "loading",
                     content: "Please wait..",
                 });
-                console.log(availability.data)
 
                 if (availability.data != null && availability.data.length > 0) {
-                    onSelectionOpen();
+                    seatPickerVisible(true);
                     messageApi.open({
                         type: "info",
                         content: "Great! Pick your seats..",
@@ -168,24 +171,24 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
         setSelectedTimeSlot(null);
 
         setBookingReq({
-            movieId: null,
+            ...bookingReq,
+            movieId: movie.movieId,
             cinemaId: null,
             timeSlotId: null,
             seatCount: null,
-            movieDate: null,
         });
 
         setReservationData({
+            ...reservationData,
             userName: user,
-            movieId: null,
+            movieId: movie.movieId,
             cinemaId: null,
             timeSlotId: null,
             seatSelection: [],
-            movieDate: null,
         });
 
         // CLOSE THE SEAT PICKER
-        onSelectionClose();
+        seatPickerVisible(false);
         onReservationFormClose();
     };
 
@@ -194,18 +197,41 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
         label: cinema.name,
     }));
 
-    const filteredTimeSlots = movieAvailability
+    // const filteredTimeSlots = movieAvailability
+    //     .find((cinema) => cinema.id === bookingReq.cinemaId)
+    //     ?.timeSlots.map((timeSlot) => ({
+    //         value: timeSlot.slotId,
+    //         label: timeSlot.startTime,
+    //     })) || [];
+
+    const currentDate = new Date();
+    const currentDateTime = currentDate.getTime();
+
+    const filteredTimeSlots = (movieAvailability
         .find((cinema) => cinema.id === bookingReq.cinemaId)
-        ?.timeSlots.map((timeSlot) => ({
+        ?.timeSlots || [])
+        .filter((timeSlot) => {
+            const requestedDateTime = new Date(timeSlot.startTime).getTime();
+
+            // CHECK THAT THE REQUESTED DATE IS SAME AS TODAY
+            if (currentDate.toDateString() === new Date(bookingReq.movieDate).toDateString()) {
+                // THEN CHECK THE START TIME IS NOT PASSED
+                return requestedDateTime > currentDateTime;
+            }
+
+            // INCLUDE ALL TIMESLOTS FOR OTHER DAYS
+            return true;
+        }) // IF THE RETURN IS TRUE, THAT OPTION WILL SHOWN TO THE USER
+        .map((timeSlot) => ({
             value: timeSlot.slotId,
             label: timeSlot.startTime,
-        })) || [];
+        }));
 
     return (
         <>
             {contextHolder}
             <div
-                className={`fixed top-0 bottom-0 left-0 right-0 ${isFormOpen ? "fixed" : "hidden"
+                className={`top-14 bottom-0 left-0 right-0 ${isFormOpen ? "fixed" : "hidden"
                     } flex flex-col justify-center items-center bg-black bg-opacity-70`}
             >
                 <div className="bg-white border text-black border-gray-300 w-full sm:w-96 py-8 flex items-center flex-col rounded-md">
@@ -220,7 +246,7 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                                     width: "100%",
                                     paddingBlock: "2.75%",
                                 }}
-                                disabledDate={(current) => current && current < moment().startOf('day')}
+                                disabledDate={(current) => current < moment().startOf('day')}
                                 onChange={(value) => {
                                     setBookingReq({
                                         ...bookingReq,
@@ -238,7 +264,7 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                             <InputNumber
                                 size="large"
                                 min={1}
-                                max={10}
+                                // max={10} // USER CAN CHECK WITH A NUMBER
                                 value={bookingReq.seatCount}
                                 onChange={(value) => {
                                     setBookingReq({
@@ -313,9 +339,8 @@ const AddReservationForm = ({ movie, onReservationFormClose, isFormOpen }) => {
                         <SeatPicker
                             isSelectionOpen={isSelectionOpen}
                             seatAvailability={seatAvailability}
-                            onSelectionClose={onSelectionClose}
-                            handleReservation={handleReservation}
-                        // setSeatSelection={setSeatSelection}
+                            closeSeatPicker={() => seatPickerVisible(false)}
+                            setSeatSelection={(seatSelection) => handleSeatSelection(seatSelection)}
                         />
                     </form>
                 </div>

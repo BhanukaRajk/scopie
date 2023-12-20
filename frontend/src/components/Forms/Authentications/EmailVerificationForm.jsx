@@ -2,14 +2,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-
 import { signUp } from "../../../apis/authAPI";
+import { message } from "antd";
 
-import {
-    message,
-} from "antd";
 
-// eslint-disable-next-line no-unused-vars
 const EmailVerificationForm = ({ isOpen, onClose }) => {
 
     const [verificationData, setVerificationData] = useState({

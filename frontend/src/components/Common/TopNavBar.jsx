@@ -21,7 +21,7 @@ const TopNavBar = () => {
 
 	return (
 		<>
-			<nav className='flex sticky left-0 right-0 top-0 z-50 justify-between p-2 bg-white rounded-es-lg rounded-ee-lg text-black shadow-lg' style={{ minWidth: '310px' }}>
+			<nav className='flex sticky left-0 right-0 top-0 z-50 justify-between p-2 bg-white rounded-es-sm rounded-ee-sm text-black shadow-lg' style={{ minWidth: '310px' }}>
 				<div
 					onClick={openDrawer}
 					className="flex flex-col justify-center cursor-pointer p-2 hover:bg-white/10  rounded-xl mx-4 transition-all"
